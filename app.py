@@ -1,22 +1,54 @@
+import time
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-st.set_page_config(page_title="Smart Feedback Intelligence", layout="wide")
+st.set_page_config(
+    page_title="Sehhaty Smart Feedback Dashboard",
+    layout="wide"
+)
 
-# ثابتات ألوان الرسومات حتى تظهر بوضوح في الوضع الليلي والنهاري
+# =========================
+# Fixed Plot Style
+# =========================
 PLOT_TEMPLATE = "plotly_white"
 PLOT_FONT_COLOR = "#1F2937"
 PLOT_BG_COLOR = "#FFFFFF"
 
-st.title("📊 Smart Feedback Intelligence Platform")
-st.write("Analyze app reviews by sentiment, themes, subthemes, language, and rating.")
+# =========================
+# Header Design
+# =========================
+st.markdown(
+    """
+    <div style="
+        padding: 28px 30px;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0891B2, #0F766E);
+        color: white;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    ">
+        <h1 style="margin-bottom: 8px; font-size: 42px;">
+            📊 Sehhaty Smart Feedback Intelligence Platform
+        </h1>
+        <p style="font-size: 19px; margin: 0;">
+            An interactive dashboard for analyzing Sehhaty app reviews by sentiment, themes, subthemes, language, and rating.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 uploaded_file = st.file_uploader("📂 Upload Excel file", type=["xlsx"])
 
+
+# =========================
+# Cleaning Functions
+# =========================
 def clean_sentiment(value):
     value = str(value).strip().lower()
+
     if value in ["positive", "pos", "إيجابي", "ايجابي"]:
         return "Positive"
     elif value in ["negative", "neg", "سلبي"]:
@@ -26,15 +58,20 @@ def clean_sentiment(value):
     else:
         return "Unknown"
 
+
 def clean_category(value):
     if pd.isna(value):
         return "Unknown"
+
     value = str(value).strip()
+
     if value == "" or value.lower() in ["nan", "none", "null", "undefined"]:
         return "Unknown"
+
     return value
 
-def apply_clean_layout(fig, height=None):
+
+def clean_plot_layout(fig, height=None):
     fig.update_layout(
         template=PLOT_TEMPLATE,
         font=dict(color=PLOT_FONT_COLOR),
@@ -43,6 +80,7 @@ def apply_clean_layout(fig, height=None):
         height=height
     )
     return fig
+
 
 if uploaded_file:
     df = pd.read_excel(uploaded_file)
@@ -90,11 +128,22 @@ if uploaded_file:
 
     if st.button("🚀 Start Analysis"):
 
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+
+        status_text.write("⏳ Preparing data...")
+        progress_bar.progress(15)
+        time.sleep(0.4)
+
         df[text_col] = df[text_col].fillna("").astype(str)
         df[theme_col] = df[theme_col].apply(clean_category)
         df[subtheme_col] = df[subtheme_col].apply(clean_category)
         df[language_col] = df[language_col].apply(clean_category)
         df[rating_col] = pd.to_numeric(df[rating_col], errors="coerce")
+
+        status_text.write("🧹 Cleaning sentiment, themes, and subthemes...")
+        progress_bar.progress(35)
+        time.sleep(0.4)
 
         df["Sentiment_Clean"] = df[sentiment_col].apply(clean_sentiment)
 
@@ -104,15 +153,31 @@ if uploaded_file:
             (df[subtheme_col] != "Unknown")
         ].copy()
 
+        status_text.write("📊 Calculating key indicators...")
+        progress_bar.progress(55)
+        time.sleep(0.4)
+
         total_reviews = len(df)
         avg_rating = analysis_df[rating_col].mean()
         positive_count = (analysis_df["Sentiment_Clean"] == "Positive").sum()
         negative_count = (analysis_df["Sentiment_Clean"] == "Negative").sum()
         neutral_count = (analysis_df["Sentiment_Clean"] == "Neutral").sum()
 
+        status_text.write("🎨 Building interactive charts...")
+        progress_bar.progress(75)
+        time.sleep(0.4)
+
+        progress_bar.progress(100)
+        status_text.write("✅ Analysis completed successfully!")
+        time.sleep(0.3)
+
         st.success("✅ Analysis Completed!")
 
+        # =========================
+        # Metrics
+        # =========================
         c1, c2, c3, c4, c5 = st.columns(5)
+
         c1.metric("Total Reviews", f"{total_reviews:,}")
         c2.metric("Avg Rating", f"{avg_rating:.2f}")
         c3.metric("Positive", f"{positive_count:,}")
@@ -178,14 +243,14 @@ if uploaded_file:
                 title="Theme",
                 tickangle=-25,
                 showgrid=False,
-                tickfont=dict(color=PLOT_FONT_COLOR),
+                tickfont=dict(color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
                 title="Total Reviews",
                 type="linear",
                 showgrid=False,
                 zeroline=False,
-                tickfont=dict(color=PLOT_FONT_COLOR),
+                tickfont=dict(color=PLOT_FONT_COLOR)
             ),
             yaxis2=dict(
                 title="Avg Rating",
@@ -194,10 +259,10 @@ if uploaded_file:
                 range=[0, 5.3],
                 showgrid=False,
                 zeroline=False,
-                tickfont=dict(color=PLOT_FONT_COLOR),
+                tickfont=dict(color=PLOT_FONT_COLOR)
             ),
-            plot_bgcolor=PLOT_BG_COLOR,
-            paper_bgcolor=PLOT_BG_COLOR,
+            plot_bgcolor="#FFFFFF",
+            paper_bgcolor="#FFFFFF",
             margin=dict(t=105, b=115, l=70, r=70)
         )
 
@@ -242,15 +307,14 @@ if uploaded_file:
                 font=dict(color=PLOT_FONT_COLOR),
                 xaxis=dict(
                     showgrid=False,
-                    tickfont=dict(color=PLOT_FONT_COLOR),
-                    titlefont=dict(color=PLOT_FONT_COLOR)
+                    tickfont=dict(color=PLOT_FONT_COLOR)
                 ),
                 yaxis=dict(
                     showgrid=False,
-                    tickfont=dict(color=PLOT_FONT_COLOR),
+                    tickfont=dict(color=PLOT_FONT_COLOR)
                 ),
-                plot_bgcolor=PLOT_BG_COLOR,
-                paper_bgcolor=PLOT_BG_COLOR
+                plot_bgcolor="#FFFFFF",
+                paper_bgcolor="#FFFFFF"
             )
 
             st.plotly_chart(fig_sent, use_container_width=True)
@@ -279,8 +343,8 @@ if uploaded_file:
                 height=480,
                 font=dict(color=PLOT_FONT_COLOR),
                 legend=dict(font=dict(color=PLOT_FONT_COLOR)),
-                plot_bgcolor=PLOT_BG_COLOR,
-                paper_bgcolor=PLOT_BG_COLOR,
+                plot_bgcolor="#FFFFFF",
+                paper_bgcolor="#FFFFFF",
                 showlegend=True
             )
 
@@ -334,16 +398,16 @@ if uploaded_file:
                 title="Negative Reviews",
                 showgrid=False,
                 range=[0, max_neg * 1.18],
-                tickfont=dict(color=PLOT_FONT_COLOR),
+                tickfont=dict(color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
                 title="Theme",
                 categoryorder="total ascending",
                 showgrid=False,
-                tickfont=dict(color=PLOT_FONT_COLOR),
+                tickfont=dict(color=PLOT_FONT_COLOR)
             ),
-            plot_bgcolor=PLOT_BG_COLOR,
-            paper_bgcolor=PLOT_BG_COLOR,
+            plot_bgcolor="#FFFFFF",
+            paper_bgcolor="#FFFFFF",
             margin=dict(l=90, r=150, t=40, b=40),
             showlegend=False
         )
@@ -385,15 +449,15 @@ if uploaded_file:
             xaxis=dict(
                 showgrid=False,
                 range=[0, max_sub * 1.18],
-                tickfont=dict(color=PLOT_FONT_COLOR),
+                tickfont=dict(color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
                 showgrid=False,
                 categoryorder="total ascending",
-                tickfont=dict(color=PLOT_FONT_COLOR),
+                tickfont=dict(color=PLOT_FONT_COLOR)
             ),
-            plot_bgcolor=PLOT_BG_COLOR,
-            paper_bgcolor=PLOT_BG_COLOR,
+            plot_bgcolor="#FFFFFF",
+            paper_bgcolor="#FFFFFF",
             margin=dict(r=160)
         )
 
