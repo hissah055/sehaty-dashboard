@@ -1,6 +1,7 @@
 import base64
 import time
 from pathlib import Path
+from io import BytesIO
 
 import streamlit as st
 import pandas as pd
@@ -120,7 +121,6 @@ st.markdown(
         transition: all 0.25s ease !important;
     }
 
-    /* Force all inner parts of selected tags */
     div[data-baseweb="tag"] *,
     span[data-baseweb="tag"] *,
     [data-baseweb="tag"] *,
@@ -131,7 +131,6 @@ st.markdown(
         fill: #FFFFFF !important;
     }
 
-    /* Text inside selected tag */
     div[data-baseweb="tag"] span,
     span[data-baseweb="tag"] span,
     [data-baseweb="tag"] span {
@@ -141,7 +140,6 @@ st.markdown(
         z-index: 2 !important;
     }
 
-    /* X icon inside selected tag */
     div[data-baseweb="tag"] svg,
     span[data-baseweb="tag"] svg,
     [data-baseweb="tag"] svg {
@@ -152,7 +150,6 @@ st.markdown(
         z-index: 3 !important;
     }
 
-    /* X button circle */
     div[data-baseweb="tag"] button,
     span[data-baseweb="tag"] button,
     [data-baseweb="tag"] button {
@@ -171,7 +168,6 @@ st.markdown(
         transform: scale(1.05);
     }
 
-    /* Soft shine on selected tags */
     div[data-baseweb="tag"]::before,
     span[data-baseweb="tag"]::before,
     [data-baseweb="tag"]::before {
@@ -210,7 +206,6 @@ st.markdown(
         }
     }
 
-    /* Hover effect */
     div[data-baseweb="tag"]:hover,
     span[data-baseweb="tag"]:hover,
     [data-baseweb="tag"]:hover {
@@ -221,7 +216,6 @@ st.markdown(
         filter: brightness(1.05);
     }
 
-    /* Extra override for Streamlit red selected tags */
     .stMultiSelect [data-baseweb="tag"],
     .stMultiSelect [data-baseweb="tag"] *,
     [data-testid="stMultiSelect"] [data-baseweb="tag"],
@@ -362,31 +356,23 @@ def get_logo_html():
 
 
 # =========================
-# Header Design
-# =========================
-logo_html = get_logo_html()
-
-header_html = f"""
-<div style="padding:28px 30px; border-radius:22px; background:linear-gradient(135deg, #0891B2, #0F766E); color:white; margin-bottom:25px; box-shadow:0 10px 30px rgba(0,0,0,0.18); display:flex; align-items:center;">
-{logo_html}
-<div>
-<h1 style="margin-bottom:8px; font-size:42px;">Sehhaty Smart Feedback Intelligence Platform</h1>
-<p style="font-size:19px; margin:0;">An interactive dashboard for analyzing Sehhaty app reviews by sentiment, themes, subthemes, language, and rating.</p>
-</div>
-</div>
-"""
-
-st.markdown(header_html, unsafe_allow_html=True)
-
-uploaded_file = st.file_uploader("📂 Upload Excel file", type=["xlsx"])
-
-
-# =========================
 # Cache Excel Loading
 # =========================
 @st.cache_data(show_spinner=False)
 def load_excel(file):
     return pd.read_excel(file)
+
+
+# =========================
+# Export Excel Function
+# =========================
+def convert_df_to_excel(dataframe):
+    output = BytesIO()
+
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        dataframe.to_excel(writer, index=False, sheet_name="Filtered_Reviews")
+
+    return output.getvalue()
 
 
 # =========================
@@ -500,10 +486,12 @@ def add_time_features(dataframe):
 
 def get_sorted_unique(series):
     values = series.dropna().unique().tolist()
+
     try:
         values = sorted(values)
     except Exception:
         values = sorted(values, key=lambda x: str(x))
+
     return values
 
 
@@ -520,10 +508,14 @@ def clear_dashboard_filters():
         "filter_sentiments",
         "filter_themes",
         "filter_subthemes",
+        "review_search_keyword",
     ]
 
     for key in filter_keys:
-        st.session_state[key] = []
+        if key == "review_search_keyword":
+            st.session_state[key] = ""
+        else:
+            st.session_state[key] = []
 
     st.session_state["analysis_ready"] = False
     st.session_state["last_filter_state"] = (
@@ -535,8 +527,28 @@ def clear_dashboard_filters():
         tuple(),
         tuple(),
         tuple(),
+        "",
     )
 
+
+# =========================
+# Header Design
+# =========================
+logo_html = get_logo_html()
+
+header_html = f"""
+<div style="padding:28px 30px; border-radius:22px; background:linear-gradient(135deg, #0891B2, #0F766E); color:white; margin-bottom:25px; box-shadow:0 10px 30px rgba(0,0,0,0.18); display:flex; align-items:center;">
+{logo_html}
+<div>
+<h1 style="margin-bottom:8px; font-size:42px;">Sehhaty Smart Feedback Intelligence Platform</h1>
+<p style="font-size:19px; margin:0;">An interactive dashboard for analyzing Sehhaty app reviews by sentiment, themes, subthemes, language, and rating.</p>
+</div>
+</div>
+"""
+
+st.markdown(header_html, unsafe_allow_html=True)
+
+uploaded_file = st.file_uploader("📂 Upload Excel file", type=["xlsx"])
 
 if uploaded_file:
     df = load_excel(uploaded_file)
@@ -700,11 +712,17 @@ if uploaded_file:
     existing_subthemes = filter_df[subtheme_col].dropna().unique().tolist()
 
     theme_options = [x for x in THEME_ORDER if x in existing_themes]
-    extra_themes = [x for x in get_sorted_unique(filter_df[theme_col]) if x not in theme_options and x != "Unknown"]
+    extra_themes = [
+        x for x in get_sorted_unique(filter_df[theme_col])
+        if x not in theme_options and x != "Unknown"
+    ]
     theme_options = theme_options + extra_themes
 
     subtheme_options = [x for x in SUBTHEME_ORDER if x in existing_subthemes]
-    extra_subthemes = [x for x in get_sorted_unique(filter_df[subtheme_col]) if x not in subtheme_options and x != "Unknown"]
+    extra_subthemes = [
+        x for x in get_sorted_unique(filter_df[subtheme_col])
+        if x not in subtheme_options and x != "Unknown"
+    ]
     subtheme_options = subtheme_options + extra_subthemes
 
     # =========================
@@ -796,7 +814,20 @@ if uploaded_file:
         )
 
     with info_col:
-        st.caption("No selection means All. Choose the filters, then click Run Analysis to display the dashboard.")
+        st.caption("No selection means All. Choose the filters and search keyword, then click Run Analysis to display the dashboard.")
+
+    # =========================
+    # Search Inside Reviews
+    # =========================
+    st.markdown("---")
+    st.subheader("🔎 Search Inside Reviews")
+    st.caption("Type any keyword to search within the filtered reviews, such as login, appointment, error, موعد, دخول.")
+
+    search_keyword = st.text_input(
+        "Search keyword",
+        placeholder="Example: login, error, appointment, موعد",
+        key="review_search_keyword"
+    )
 
     # =========================
     # Run Analysis Control
@@ -810,6 +841,7 @@ if uploaded_file:
         tuple(selected_sentiments),
         tuple(selected_themes),
         tuple(selected_subthemes),
+        search_keyword.strip(),
     )
 
     if "last_filter_state" not in st.session_state:
@@ -846,7 +878,7 @@ if uploaded_file:
         progress_bar.empty()
 
     if not st.session_state.get("analysis_ready", False):
-        st.info("👆 Please choose the filters, then click **Run Analysis** to display the dashboard charts and results.")
+        st.info("👆 Please choose the filters or search keyword, then click **Run Analysis** to display the dashboard charts and results.")
         st.stop()
 
     def apply_dashboard_filters(dataframe):
@@ -880,6 +912,13 @@ if uploaded_file:
 
     analysis_source_df = apply_dashboard_filters(filter_df)
 
+    if search_keyword.strip():
+        analysis_source_df = analysis_source_df[
+            analysis_source_df[text_col]
+            .astype(str)
+            .str.contains(search_keyword.strip(), case=False, na=False)
+        ]
+
     analysis_df = analysis_source_df[
         (analysis_source_df["Sentiment_Clean"] != "Unknown") &
         (analysis_source_df[theme_col] != "Unknown") &
@@ -887,7 +926,7 @@ if uploaded_file:
     ].copy()
 
     if analysis_df.empty:
-        st.warning("⚠️ No data available for the selected filters. Please adjust the filters.")
+        st.warning("⚠️ No data available for the selected filters or search keyword. Please adjust your selections.")
         st.stop()
 
     # =========================
@@ -906,11 +945,81 @@ if uploaded_file:
 
     st.success("✅ Analysis Completed!")
 
+    # =========================
+    # Main Counts
+    # =========================
     total_reviews = len(analysis_source_df)
     avg_rating = analysis_df[rating_col].mean()
     positive_count = (analysis_df["Sentiment_Clean"] == "Positive").sum()
     negative_count = (analysis_df["Sentiment_Clean"] == "Negative").sum()
     neutral_count = (analysis_df["Sentiment_Clean"] == "Neutral").sum()
+
+    positive_rate = (positive_count / len(analysis_df) * 100) if len(analysis_df) > 0 else 0
+    negative_rate = (negative_count / len(analysis_df) * 100) if len(analysis_df) > 0 else 0
+
+    top_theme_name = (
+        analysis_df[theme_col].value_counts().idxmax()
+        if not analysis_df[theme_col].value_counts().empty
+        else "N/A"
+    )
+
+    top_subtheme_name = (
+        analysis_df[subtheme_col].value_counts().idxmax()
+        if not analysis_df[subtheme_col].value_counts().empty
+        else "N/A"
+    )
+
+    negative_df_for_summary = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
+
+    top_negative_theme_name = (
+        negative_df_for_summary[theme_col].value_counts().idxmax()
+        if not negative_df_for_summary.empty and not negative_df_for_summary[theme_col].value_counts().empty
+        else "N/A"
+    )
+
+    # =========================
+    # Executive Summary
+    # =========================
+    summary_html = f"""
+<style>
+.summary-box {{
+    background: linear-gradient(135deg, #0891B2, #0F766E);
+    color: white;
+    padding: 22px 26px;
+    border-radius: 20px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+    margin-top: 18px;
+    margin-bottom: 18px;
+}}
+.summary-title {{
+    font-size: 26px;
+    font-weight: 850;
+    margin-bottom: 12px;
+}}
+.summary-text {{
+    font-size: 17px;
+    line-height: 1.8;
+}}
+.summary-highlight {{
+    font-weight: 850;
+    color: #ECFEFF;
+}}
+</style>
+
+<div class="summary-box">
+    <div class="summary-title">📌 Executive Summary</div>
+    <div class="summary-text">
+        This dashboard analyzes <span class="summary-highlight">{total_reviews:,}</span> filtered Sehhaty app reviews.
+        The average rating is <span class="summary-highlight">{avg_rating:.2f}</span>.
+        Positive reviews represent <span class="summary-highlight">{positive_rate:.1f}%</span>,
+        while negative reviews represent <span class="summary-highlight">{negative_rate:.1f}%</span>.
+        The most common main theme is <span class="summary-highlight">{top_theme_name}</span>,
+        and the most frequent subtheme is <span class="summary-highlight">{top_subtheme_name}</span>.
+        The main area of concern among negative reviews is <span class="summary-highlight">{top_negative_theme_name}</span>.
+    </div>
+</div>
+"""
+    st.markdown(summary_html, unsafe_allow_html=True)
 
     st.caption(
         f"Filtered dataset: {len(analysis_source_df):,} reviews | "
@@ -1068,6 +1177,61 @@ if uploaded_file:
 <div class="insight-grid"><div class="insight-card"><span class="insight-icon">📅</span><div class="insight-title">Most Active Year</div><div class="insight-value">{top_year_text}</div></div><div class="insight-card"><span class="insight-icon">⭐</span><div class="insight-title">Best Avg Rating Year</div><div class="insight-value">{best_year_text}</div></div><div class="insight-card"><span class="insight-icon">🏆</span><div class="insight-title">Top Theme</div><div class="insight-value">{top_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🔥</span><div class="insight-title">Most Negative Theme</div><div class="insight-value">{negative_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🧩</span><div class="insight-title">Top Subtheme</div><div class="insight-value">{top_subtheme_text}</div></div><div class="insight-card"><span class="insight-icon">📉</span><div class="insight-title">Negative Reviews Rate</div><div class="insight-value">{negative_rate_text}</div></div></div>
 """
     st.markdown(insights_html, unsafe_allow_html=True)
+
+    # =========================
+    # Recommendations
+    # =========================
+    recommendations = []
+
+    if negative_rate >= 30:
+        recommendations.append("Prioritize negative feedback analysis because the negative review rate is relatively high.")
+    else:
+        recommendations.append("Continue monitoring negative feedback to identify early signs of user dissatisfaction.")
+
+    if top_negative_theme_name != "N/A":
+        recommendations.append(f"Focus improvement efforts on: {top_negative_theme_name}.")
+
+    if top_subtheme_name != "N/A":
+        recommendations.append(f"Investigate the most frequent subtheme: {top_subtheme_name}.")
+
+    recommendations.append("Review low-rating comments to identify urgent usability, access, or technical issues.")
+    recommendations.append("Use year, quarter, language, and sentiment filters to compare changes over time.")
+
+    recommendation_items = "".join([f"<li>{item}</li>" for item in recommendations])
+
+    recommendations_html = f"""
+<style>
+.recommendation-box {{
+    background: #FFFFFF;
+    color: #111827;
+    padding: 22px 26px;
+    border-radius: 20px;
+    border-left: 7px solid #0F766E;
+    box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+    margin-top: 14px;
+    margin-bottom: 18px;
+}}
+.recommendation-title {{
+    color: #0F766E;
+    font-size: 24px;
+    font-weight: 850;
+    margin-bottom: 12px;
+}}
+.recommendation-box li {{
+    font-size: 16px;
+    margin-bottom: 8px;
+    line-height: 1.6;
+}}
+</style>
+
+<div class="recommendation-box">
+    <div class="recommendation-title">💡 Recommended Actions</div>
+    <ul>
+        {recommendation_items}
+    </ul>
+</div>
+"""
+    st.markdown(recommendations_html, unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -1676,3 +1840,13 @@ if uploaded_file:
     full_filtered_df = full_filtered_df.reset_index(drop=True)
 
     st.dataframe(full_filtered_df, width="stretch", hide_index=True)
+
+    excel_file = convert_df_to_excel(full_filtered_df)
+
+    st.download_button(
+        label="⬇️ Download filtered reviews as Excel",
+        data=excel_file,
+        file_name="sehhaty_filtered_reviews.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        use_container_width=True
+    )
