@@ -3,15 +3,21 @@ import time
 from pathlib import Path
 from io import BytesIO
 
+
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+
+
 st.set_page_config(
     page_title="Sehhaty Smart Feedback Dashboard",
     layout="wide"
 )
+
+
 
 # =========================
 # App Global Style - Better Visibility in Light & Dark Mode
@@ -32,10 +38,14 @@ st.markdown(
         --menu-bg: #FFFFFF;
     }
 
+
+
     /* Green progress bar */
     .stProgress > div > div > div > div {
         background-color: #22C55E !important;
     }
+
+
 
     /* Main labels */
     label p,
@@ -44,6 +54,8 @@ st.markdown(
         font-weight: 800 !important;
         color: var(--label-color) !important;
     }
+
+
 
     /* Sidebar labels + sidebar header */
     section[data-testid="stSidebar"] label p,
@@ -56,6 +68,8 @@ st.markdown(
         font-weight: 800 !important;
     }
 
+
+
     /* File uploader label */
     [data-testid="stFileUploader"] label,
     [data-testid="stFileUploader"] label p,
@@ -63,6 +77,8 @@ st.markdown(
         color: var(--label-color) !important;
         font-weight: 800 !important;
     }
+
+
 
     /* Captions / helper text */
     .stCaption,
@@ -72,6 +88,8 @@ st.markdown(
         color: var(--helper-color) !important;
         font-weight: 650 !important;
     }
+
+
 
     /* Main select boxes + sidebar select boxes */
     div[data-baseweb="select"] > div,
@@ -84,10 +102,14 @@ st.markdown(
         box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10) !important;
     }
 
+
+
     div[data-baseweb="select"] *,
     section[data-testid="stSidebar"] div[data-baseweb="select"] * {
         color: var(--text-dark) !important;
     }
+
+
 
     div[data-baseweb="select"] svg,
     section[data-testid="stSidebar"] div[data-baseweb="select"] svg {
@@ -96,9 +118,13 @@ st.markdown(
         filter: drop-shadow(0 0 3px rgba(15,118,110,0.25));
     }
 
+
+
     /* ========================= */
     /* Force selected multiselect tags to teal, not red */
     /* ========================= */
+
+
 
     div[data-baseweb="tag"],
     span[data-baseweb="tag"],
@@ -121,6 +147,8 @@ st.markdown(
         transition: all 0.25s ease !important;
     }
 
+
+
     div[data-baseweb="tag"] *,
     span[data-baseweb="tag"] *,
     [data-baseweb="tag"] *,
@@ -131,6 +159,8 @@ st.markdown(
         fill: #FFFFFF !important;
     }
 
+
+
     div[data-baseweb="tag"] span,
     span[data-baseweb="tag"] span,
     [data-baseweb="tag"] span {
@@ -139,6 +169,8 @@ st.markdown(
         position: relative !important;
         z-index: 2 !important;
     }
+
+
 
     div[data-baseweb="tag"] svg,
     span[data-baseweb="tag"] svg,
@@ -149,6 +181,8 @@ st.markdown(
         position: relative !important;
         z-index: 3 !important;
     }
+
+
 
     div[data-baseweb="tag"] button,
     span[data-baseweb="tag"] button,
@@ -161,12 +195,16 @@ st.markdown(
         z-index: 3 !important;
     }
 
+
+
     div[data-baseweb="tag"] button:hover,
     span[data-baseweb="tag"] button:hover,
     [data-baseweb="tag"] button:hover {
         background: rgba(255,255,255,0.32) !important;
         transform: scale(1.05);
     }
+
+
 
     div[data-baseweb="tag"]::before,
     span[data-baseweb="tag"]::before,
@@ -191,6 +229,8 @@ st.markdown(
         z-index: 1;
     }
 
+
+
     @keyframes selectedTagShine {
         0% {
             left: -85%;
@@ -206,6 +246,8 @@ st.markdown(
         }
     }
 
+
+
     div[data-baseweb="tag"]:hover,
     span[data-baseweb="tag"]:hover,
     [data-baseweb="tag"]:hover {
@@ -215,6 +257,8 @@ st.markdown(
             inset 0 0 12px rgba(255,255,255,0.18) !important;
         filter: brightness(1.05);
     }
+
+
 
     .stMultiSelect [data-baseweb="tag"],
     .stMultiSelect [data-baseweb="tag"] *,
@@ -226,11 +270,15 @@ st.markdown(
         fill: #FFFFFF !important;
     }
 
+
+
     /* Force dropdown menu white in dark mode */
     div[data-baseweb="popover"] {
         background: transparent !important;
         color: var(--text-dark) !important;
     }
+
+
 
     div[data-baseweb="popover"] > div,
     div[data-baseweb="popover"] > div > div,
@@ -239,6 +287,8 @@ st.markdown(
         background-color: var(--menu-bg) !important;
         color: var(--text-dark) !important;
     }
+
+
 
     div[role="listbox"],
     ul[role="listbox"],
@@ -250,6 +300,8 @@ st.markdown(
         border-radius: 12px !important;
     }
 
+
+
     div[role="option"],
     li[role="option"] {
         background-color: var(--menu-bg) !important;
@@ -257,11 +309,15 @@ st.markdown(
         font-weight: 600 !important;
     }
 
+
+
     div[role="option"] *,
     li[role="option"] * {
         color: var(--text-dark) !important;
         background-color: transparent !important;
     }
+
+
 
     div[role="option"]:hover,
     li[role="option"]:hover {
@@ -269,10 +325,14 @@ st.markdown(
         color: var(--text-dark) !important;
     }
 
+
+
     div[role="option"]:hover *,
     li[role="option"]:hover * {
         color: var(--text-dark) !important;
     }
+
+
 
     div[aria-selected="true"],
     li[aria-selected="true"] {
@@ -280,10 +340,14 @@ st.markdown(
         color: var(--text-dark) !important;
     }
 
+
+
     div[aria-selected="true"] *,
     li[aria-selected="true"] * {
         color: var(--text-dark) !important;
     }
+
+
 
     div[data-baseweb="popover"] input {
         background-color: #F8FAFC !important;
@@ -293,10 +357,14 @@ st.markdown(
         caret-color: var(--text-dark) !important;
     }
 
+
+
     div[data-baseweb="popover"] input::placeholder {
         color: var(--placeholder-color) !important;
         opacity: 1 !important;
     }
+
+
 
     div[data-baseweb="popover"] input[value],
     div[data-baseweb="popover"] label,
@@ -304,6 +372,8 @@ st.markdown(
     div[data-baseweb="popover"] p {
         color: var(--text-dark) !important;
     }
+
+
 
     div.stButton > button[kind="primary"] {
         background: linear-gradient(135deg, var(--accent-main), var(--accent-dark)) !important;
@@ -314,10 +384,14 @@ st.markdown(
         box-shadow: 0 8px 20px rgba(15, 118, 110, 0.25) !important;
     }
 
+
+
     div.stButton > button[kind="primary"]:hover {
         filter: brightness(1.08);
         transform: translateY(-1px);
     }
+
+
 
     div.stButton > button {
         border-radius: 12px !important;
@@ -327,6 +401,8 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+
 
 # =========================
 # Fixed Plot Style
@@ -339,11 +415,14 @@ PLOT_TICK_SIZE = 15
 PLOT_TITLE_SIZE = 24
 
 
+
 # =========================
 # Logo Function
 # =========================
 def get_logo_html():
     logo_path = Path("sehhaty_logo.png")
+
+
 
     if logo_path.exists():
         logo_base64 = base64.b64encode(logo_path.read_bytes()).decode()
@@ -352,7 +431,10 @@ def get_logo_html():
             f'style="width:300px; height:170px; object-fit:contain; margin-right:45px;">'
         )
 
+
+
     return '<div style="font-size:60px; margin-right:20px;">📊</div>'
+
 
 
 # =========================
@@ -363,16 +445,22 @@ def load_excel(file):
     return pd.read_excel(file)
 
 
+
 # =========================
 # Export Excel Function
 # =========================
 def convert_df_to_excel(dataframe):
     output = BytesIO()
 
+
+
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         dataframe.to_excel(writer, index=False, sheet_name="Filtered_Reviews")
 
+
+
     return output.getvalue()
+
 
 
 # =========================
@@ -380,6 +468,8 @@ def convert_df_to_excel(dataframe):
 # =========================
 def clean_sentiment(value):
     value = str(value).strip().lower()
+
+
 
     if value in ["positive", "pos", "إيجابي", "ايجابي"]:
         return "Positive"
@@ -391,16 +481,24 @@ def clean_sentiment(value):
         return "Unknown"
 
 
+
 def clean_category(value):
     if pd.isna(value):
         return "Unknown"
 
+
+
     value = str(value).strip()
+
+
 
     if value == "" or value.lower() in ["nan", "none", "null", "undefined"]:
         return "Unknown"
 
+
+
     return value
+
 
 
 def normalize_col_name(col):
@@ -414,6 +512,7 @@ def normalize_col_name(col):
     )
 
 
+
 def find_column_by_keywords(columns, keywords):
     for col in columns:
         col_clean = normalize_col_name(col)
@@ -423,11 +522,16 @@ def find_column_by_keywords(columns, keywords):
     return None
 
 
+
 def remove_private_columns(dataframe):
     private_cols = []
 
+
+
     for col in dataframe.columns:
         col_clean = normalize_col_name(col)
+
+
 
         if (
             "username" in col_clean
@@ -437,26 +541,37 @@ def remove_private_columns(dataframe):
         ):
             private_cols.append(col)
 
+
+
     return dataframe.drop(columns=private_cols, errors="ignore")
+
 
 
 def add_time_features(dataframe):
     df = dataframe.copy()
+
+
 
     year_col = find_column_by_keywords(
         df.columns,
         ["reviewyear", "year"]
     )
 
+
+
     month_col = find_column_by_keywords(
         df.columns,
         ["reviewmonth", "month"]
     )
 
+
+
     date_col = find_column_by_keywords(
         df.columns,
         ["reviewdate", "date"]
     )
+
+
 
     if year_col is not None:
         df["Dashboard_Year"] = pd.to_numeric(df[year_col], errors="coerce")
@@ -466,6 +581,8 @@ def add_time_features(dataframe):
     else:
         df["Dashboard_Year"] = pd.NA
 
+
+
     if month_col is not None:
         df["Dashboard_Month"] = pd.to_numeric(df[month_col], errors="coerce")
     elif date_col is not None:
@@ -474,25 +591,37 @@ def add_time_features(dataframe):
     else:
         df["Dashboard_Month"] = pd.NA
 
+
+
     df["Dashboard_Quarter"] = pd.NA
     valid_months = df["Dashboard_Month"].notna()
+
+
 
     df.loc[valid_months, "Dashboard_Quarter"] = (
         "Q" + (((df.loc[valid_months, "Dashboard_Month"].astype(int) - 1) // 3) + 1).astype(str)
     )
 
+
+
     return df
+
 
 
 def get_sorted_unique(series):
     values = series.dropna().unique().tolist()
+
+
 
     try:
         values = sorted(values)
     except Exception:
         values = sorted(values, key=lambda x: str(x))
 
+
+
     return values
+
 
 
 # =========================
@@ -511,11 +640,15 @@ def clear_dashboard_filters():
         "review_search_keyword",
     ]
 
+
+
     for key in filter_keys:
         if key == "review_search_keyword":
             st.session_state[key] = ""
         else:
             st.session_state[key] = []
+
+
 
     st.session_state["analysis_ready"] = False
     st.session_state["last_filter_state"] = (
@@ -531,10 +664,13 @@ def clear_dashboard_filters():
     )
 
 
+
 # =========================
 # Header Design
 # =========================
 logo_html = get_logo_html()
+
+
 
 header_html = f"""
 <div style="padding:28px 30px; border-radius:22px; background:linear-gradient(135deg, #0891B2, #0F766E); color:white; margin-bottom:25px; box-shadow:0 10px 30px rgba(0,0,0,0.18); display:flex; align-items:center;">
@@ -546,18 +682,28 @@ header_html = f"""
 </div>
 """
 
+
+
 st.markdown(header_html, unsafe_allow_html=True)
 
+
+
 uploaded_file = st.file_uploader("📂 Upload Excel file", type=["xlsx"])
+
+
 
 if uploaded_file:
     df = load_excel(uploaded_file)
     df = add_time_features(df)
 
+
+
     # =========================
     # Column Settings
     # =========================
     st.sidebar.header("⚙️ Column Settings")
+
+
 
     text_col = st.sidebar.selectbox(
         "Review text column",
@@ -565,11 +711,15 @@ if uploaded_file:
         index=list(df.columns).index("Content_Clean") if "Content_Clean" in df.columns else 0
     )
 
+
+
     sentiment_col = st.sidebar.selectbox(
         "Sentiment column",
         df.columns,
         index=list(df.columns).index("Sentiment") if "Sentiment" in df.columns else 0
     )
+
+
 
     theme_col = st.sidebar.selectbox(
         "Main Theme column",
@@ -577,11 +727,15 @@ if uploaded_file:
         index=list(df.columns).index("Theme") if "Theme" in df.columns else 0
     )
 
+
+
     subtheme_col = st.sidebar.selectbox(
         "Subtheme column",
         df.columns,
         index=list(df.columns).index("Subtheme") if "Subtheme" in df.columns else 0
     )
+
+
 
     language_col = st.sidebar.selectbox(
         "Language column",
@@ -589,11 +743,15 @@ if uploaded_file:
         index=list(df.columns).index("Language") if "Language" in df.columns else 0
     )
 
+
+
     rating_col = st.sidebar.selectbox(
         "Rating column",
         df.columns,
         index=list(df.columns).index("Rating") if "Rating" in df.columns else 0
     )
+
+
 
     # =========================
     # Prepare Filter Data
@@ -605,6 +763,8 @@ if uploaded_file:
     filter_df[language_col] = filter_df[language_col].apply(clean_category)
     filter_df[rating_col] = pd.to_numeric(filter_df[rating_col], errors="coerce")
     filter_df["Sentiment_Clean"] = filter_df[sentiment_col].apply(clean_sentiment)
+
+
 
     # =========================
     # Dashboard Filter Title
@@ -627,11 +787,15 @@ if uploaded_file:
 """
     st.markdown(filter_style_html, unsafe_allow_html=True)
 
+
+
     # =========================
     # Filter Options
     # =========================
     year_options = get_sorted_unique(filter_df["Dashboard_Year"])
     year_options = [int(y) for y in year_options if pd.notna(y)]
+
+
 
     quarter_order = ["Q1", "Q2", "Q3", "Q4"]
     quarter_options = [
@@ -639,8 +803,12 @@ if uploaded_file:
         if q in filter_df["Dashboard_Quarter"].dropna().unique().tolist()
     ]
 
+
+
     month_options = get_sorted_unique(filter_df["Dashboard_Month"])
     month_options = [int(m) for m in month_options if pd.notna(m)]
+
+
 
     rating_options = get_sorted_unique(filter_df[rating_col])
     rating_options = [
@@ -649,13 +817,19 @@ if uploaded_file:
         if pd.notna(r)
     ]
 
+
+
     language_options = get_sorted_unique(filter_df[language_col])
+
+
 
     sentiment_options = ["Positive", "Negative", "Neutral"]
     sentiment_options = [
         s for s in sentiment_options
         if s in filter_df["Sentiment_Clean"].dropna().unique().tolist()
     ]
+
+
 
     THEME_ORDER = [
         "Technical Performance",
@@ -664,6 +838,8 @@ if uploaded_file:
         "Suggestions & UI Design",
         "Security & Support"
     ]
+
+
 
     SUBTHEME_ORDER = [
         "App Speed",
@@ -675,6 +851,8 @@ if uploaded_file:
         "General",
         "General_Technical",
 
+
+
         "Appointment Booking",
         "Results Delivery",
         "Reports/Documents",
@@ -682,6 +860,8 @@ if uploaded_file:
         "Records/Vaccination",
         "Teleconsultation",
         "General_Content",
+
+
 
         "Ease of Use",
         "Navigation",
@@ -691,6 +871,8 @@ if uploaded_file:
         "Accessibility Help & Guidance",
         "General_UX",
 
+
+
         "Feature Request – Dark Mode",
         "Notifications & Reminders",
         "Layout Improvements",
@@ -698,6 +880,8 @@ if uploaded_file:
         "Language Options",
         "Accessibility Enhancements",
         "General_Suggestions",
+
+
 
         "Login/OTP",
         "Password Reset",
@@ -708,8 +892,12 @@ if uploaded_file:
         "General_Security"
     ]
 
+
+
     existing_themes = filter_df[theme_col].dropna().unique().tolist()
     existing_subthemes = filter_df[subtheme_col].dropna().unique().tolist()
+
+
 
     theme_options = [x for x in THEME_ORDER if x in existing_themes]
     extra_themes = [
@@ -718,6 +906,8 @@ if uploaded_file:
     ]
     theme_options = theme_options + extra_themes
 
+
+
     subtheme_options = [x for x in SUBTHEME_ORDER if x in existing_subthemes]
     extra_subthemes = [
         x for x in get_sorted_unique(filter_df[subtheme_col])
@@ -725,10 +915,14 @@ if uploaded_file:
     ]
     subtheme_options = subtheme_options + extra_subthemes
 
+
+
     # =========================
     # Top Filters
     # =========================
     f1, f2, f3, f4 = st.columns(4)
+
+
 
     with f1:
         selected_years = st.multiselect(
@@ -739,6 +933,8 @@ if uploaded_file:
             key="filter_years"
         )
 
+
+
     with f2:
         selected_quarters = st.multiselect(
             "Quarter",
@@ -747,6 +943,8 @@ if uploaded_file:
             placeholder="All quarters",
             key="filter_quarters"
         )
+
+
 
     with f3:
         selected_months = st.multiselect(
@@ -757,6 +955,8 @@ if uploaded_file:
             key="filter_months"
         )
 
+
+
     with f4:
         selected_ratings = st.multiselect(
             "Rating",
@@ -766,7 +966,11 @@ if uploaded_file:
             key="filter_ratings"
         )
 
+
+
     f5, f6, f7, f8 = st.columns([1.2, 1.2, 1.6, 1.6])
+
+
 
     with f5:
         selected_languages = st.multiselect(
@@ -777,6 +981,8 @@ if uploaded_file:
             key="filter_languages"
         )
 
+
+
     with f6:
         selected_sentiments = st.multiselect(
             "Sentiment",
@@ -785,6 +991,8 @@ if uploaded_file:
             placeholder="All sentiments",
             key="filter_sentiments"
         )
+
+
 
     with f7:
         selected_themes = st.multiselect(
@@ -795,6 +1003,8 @@ if uploaded_file:
             key="filter_themes"
         )
 
+
+
     with f8:
         selected_subthemes = st.multiselect(
             "Subtheme",
@@ -804,7 +1014,11 @@ if uploaded_file:
             key="filter_subthemes"
         )
 
+
+
     clear_col, info_col = st.columns([1, 5])
+
+
 
     with clear_col:
         st.button(
@@ -813,8 +1027,12 @@ if uploaded_file:
             on_click=clear_dashboard_filters
         )
 
+
+
     with info_col:
         st.caption("No selection means All. Choose the filters and search keyword, then click Run Analysis to display the dashboard.")
+
+
 
     # =========================
     # Search Inside Reviews
@@ -823,11 +1041,15 @@ if uploaded_file:
     st.subheader("🔎 Search Inside Reviews")
     st.caption("Type any keyword to search within the filtered reviews, such as login, appointment, error, موعد, دخول.")
 
+
+
     search_keyword = st.text_input(
         "Search keyword",
         placeholder="Example: login, error, appointment, موعد",
         key="review_search_keyword"
     )
+
+
 
     # =========================
     # Run Analysis Control
@@ -844,73 +1066,121 @@ if uploaded_file:
         search_keyword.strip(),
     )
 
+
+
     if "last_filter_state" not in st.session_state:
         st.session_state["last_filter_state"] = current_filter_state
+
+
 
     if st.session_state["last_filter_state"] != current_filter_state:
         st.session_state["analysis_ready"] = False
         st.session_state["last_filter_state"] = current_filter_state
 
+
+
     run_col, note_col = st.columns([1.2, 4.8])
+
+
 
     with run_col:
         run_analysis = st.button("🚀 Run Analysis", type="primary", use_container_width=True)
 
+
+
     with note_col:
         st.caption("The charts and results will appear after clicking Run Analysis.")
+
+
 
     if run_analysis:
         progress_bar = st.progress(0, text="Preparing data...")
 
+
+
         progress_bar.progress(25, text="Applying selected filters...")
         time.sleep(0.25)
+
+
 
         progress_bar.progress(55, text="Calculating indicators...")
         time.sleep(0.25)
 
+
+
         progress_bar.progress(80, text="Building charts...")
         time.sleep(0.25)
+
+
 
         progress_bar.progress(100, text="Analysis completed!")
         time.sleep(0.25)
 
+
+
         st.session_state["analysis_ready"] = True
         progress_bar.empty()
+
+
 
     if not st.session_state.get("analysis_ready", False):
         st.info("👆 Please choose the filters or search keyword, then click **Run Analysis** to display the dashboard charts and results.")
         st.stop()
 
+
+
     def apply_dashboard_filters(dataframe):
         result = dataframe.copy()
+
+
 
         if selected_years and "Dashboard_Year" in result.columns:
             result = result[result["Dashboard_Year"].isin(selected_years)]
 
+
+
         if selected_quarters and "Dashboard_Quarter" in result.columns:
             result = result[result["Dashboard_Quarter"].isin(selected_quarters)]
+
+
 
         if selected_months and "Dashboard_Month" in result.columns:
             result = result[result["Dashboard_Month"].isin(selected_months)]
 
+
+
         if selected_ratings:
             result = result[result[rating_col].isin(selected_ratings)]
+
+
 
         if selected_languages:
             result = result[result[language_col].isin(selected_languages)]
 
+
+
         if selected_sentiments:
             result = result[result["Sentiment_Clean"].isin(selected_sentiments)]
+
+
 
         if selected_themes:
             result = result[result[theme_col].isin(selected_themes)]
 
+
+
         if selected_subthemes:
             result = result[result[subtheme_col].isin(selected_subthemes)]
 
+
+
         return result
 
+
+
     analysis_source_df = apply_dashboard_filters(filter_df)
+
+
 
     if search_keyword.strip():
         analysis_source_df = analysis_source_df[
@@ -919,15 +1189,21 @@ if uploaded_file:
             .str.contains(search_keyword.strip(), case=False, na=False)
         ]
 
+
+
     analysis_df = analysis_source_df[
         (analysis_source_df["Sentiment_Clean"] != "Unknown") &
         (analysis_source_df[theme_col] != "Unknown") &
         (analysis_source_df[subtheme_col] != "Unknown")
     ].copy()
 
+
+
     if analysis_df.empty:
         st.warning("⚠️ No data available for the selected filters or search keyword. Please adjust your selections.")
         st.stop()
+
+
 
     # =========================
     # Data Preview at the Top
@@ -936,14 +1212,22 @@ if uploaded_file:
     st.subheader("🔍 Data Preview")
     st.caption("Showing a filtered preview with usernames removed for privacy.")
 
+
+
     preview_df = analysis_source_df.head(5).copy()
     preview_df = remove_private_columns(preview_df)
     preview_df.insert(0, "Review_ID", range(1, len(preview_df) + 1))
     preview_df = preview_df.reset_index(drop=True)
 
+
+
     st.dataframe(preview_df, width="stretch", hide_index=True)
 
+
+
     st.success("✅ Analysis Completed!")
+
+
 
     # =========================
     # Main Counts
@@ -954,8 +1238,12 @@ if uploaded_file:
     negative_count = (analysis_df["Sentiment_Clean"] == "Negative").sum()
     neutral_count = (analysis_df["Sentiment_Clean"] == "Neutral").sum()
 
+
+
     positive_rate = (positive_count / len(analysis_df) * 100) if len(analysis_df) > 0 else 0
     negative_rate = (negative_count / len(analysis_df) * 100) if len(analysis_df) > 0 else 0
+
+
 
     top_theme_name = (
         analysis_df[theme_col].value_counts().idxmax()
@@ -963,19 +1251,27 @@ if uploaded_file:
         else "N/A"
     )
 
+
+
     top_subtheme_name = (
         analysis_df[subtheme_col].value_counts().idxmax()
         if not analysis_df[subtheme_col].value_counts().empty
         else "N/A"
     )
 
+
+
     negative_df_for_summary = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
+
+
 
     top_negative_theme_name = (
         negative_df_for_summary[theme_col].value_counts().idxmax()
         if not negative_df_for_summary.empty and not negative_df_for_summary[theme_col].value_counts().empty
         else "N/A"
     )
+
+
 
     # =========================
     # Executive Summary
@@ -1006,6 +1302,8 @@ if uploaded_file:
 }}
 </style>
 
+
+
 <div class="summary-box">
     <div class="summary-title">📌 Executive Summary</div>
     <div class="summary-text">
@@ -1021,10 +1319,14 @@ if uploaded_file:
 """
     st.markdown(summary_html, unsafe_allow_html=True)
 
+
+
     st.caption(
         f"Filtered dataset: {len(analysis_source_df):,} reviews | "
         f"Valid analysis rows: {len(analysis_df):,}"
     )
+
+
 
     # =========================
     # KPI Metric Cards
@@ -1082,11 +1384,15 @@ if uploaded_file:
 """
     st.markdown(metric_cards_html, unsafe_allow_html=True)
 
+
+
     # =========================
     # Smart Insights Summary
     # =========================
     st.markdown("---")
     st.subheader("✨ Smart Insights Summary")
+
+
 
     top_year_text = "N/A"
     best_year_text = "N/A"
@@ -1095,12 +1401,16 @@ if uploaded_file:
     top_subtheme_text = "N/A"
     negative_rate_text = "0%"
 
+
+
     year_insight_df = analysis_df.dropna(subset=["Dashboard_Year"]).copy()
     if not year_insight_df.empty:
         year_counts = year_insight_df.groupby("Dashboard_Year").size()
         top_year = int(year_counts.idxmax())
         top_year_count = int(year_counts.max())
         top_year_text = f"{top_year} ({top_year_count:,})"
+
+
 
     year_rating_insight_df = analysis_df.dropna(subset=["Dashboard_Year", rating_col]).copy()
     if not year_rating_insight_df.empty:
@@ -1109,9 +1419,13 @@ if uploaded_file:
         best_year_rating = avg_by_year.max()
         best_year_text = f"{best_year} ({best_year_rating:.2f})"
 
+
+
     theme_counts = analysis_df[theme_col].value_counts()
     if not theme_counts.empty:
         top_theme_text = f"{theme_counts.index[0]} ({theme_counts.iloc[0]:,})"
+
+
 
     negative_df = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
     if not negative_df.empty:
@@ -1119,13 +1433,19 @@ if uploaded_file:
         if not negative_theme_counts.empty:
             negative_theme_text = f"{negative_theme_counts.index[0]} ({negative_theme_counts.iloc[0]:,})"
 
+
+
     subtheme_counts = analysis_df[subtheme_col].value_counts()
     if not subtheme_counts.empty:
         top_subtheme_text = f"{subtheme_counts.index[0]} ({subtheme_counts.iloc[0]:,})"
 
+
+
     if len(analysis_df) > 0:
         negative_rate = (negative_count / len(analysis_df)) * 100
         negative_rate_text = f"{negative_rate:.1f}%"
+
+
 
     insights_html = f"""
 <style>
@@ -1178,26 +1498,40 @@ if uploaded_file:
 """
     st.markdown(insights_html, unsafe_allow_html=True)
 
+
+
     # =========================
     # Recommendations
     # =========================
     recommendations = []
+
+
 
     if negative_rate >= 30:
         recommendations.append("Prioritize negative feedback analysis because the negative review rate is relatively high.")
     else:
         recommendations.append("Continue monitoring negative feedback to identify early signs of user dissatisfaction.")
 
+
+
     if top_negative_theme_name != "N/A":
         recommendations.append(f"Focus improvement efforts on: {top_negative_theme_name}.")
+
+
 
     if top_subtheme_name != "N/A":
         recommendations.append(f"Investigate the most frequent subtheme: {top_subtheme_name}.")
 
+
+
     recommendations.append("Review low-rating comments to identify urgent usability, access, or technical issues.")
     recommendations.append("Use year, quarter, language, and sentiment filters to compare changes over time.")
 
+
+
     recommendation_items = "".join([f"<li>{item}</li>" for item in recommendations])
+
+
 
     recommendations_html = f"""
 <style>
@@ -1224,6 +1558,8 @@ if uploaded_file:
 }}
 </style>
 
+
+
 <div class="recommendation-box">
     <div class="recommendation-title">💡 Recommended Actions</div>
     <ul>
@@ -1233,26 +1569,40 @@ if uploaded_file:
 """
     st.markdown(recommendations_html, unsafe_allow_html=True)
 
+
+
     st.markdown("---")
+
+
 
     # =========================
     # Time Analysis: Year + Quarter
     # =========================
     st.subheader("📅 Time-Based Analysis")
 
+
+
     time_col1, time_col2 = st.columns(2)
+
+
 
     with time_col1:
         year_df = analysis_df.dropna(subset=["Dashboard_Year"]).copy()
+
+
 
         if not year_df.empty:
             year_summary = year_df.groupby("Dashboard_Year").agg(
                 Total_Reviews=("Dashboard_Year", "count")
             ).reset_index()
 
+
+
             year_summary["Dashboard_Year"] = year_summary["Dashboard_Year"].astype(int)
             year_summary = year_summary.sort_values("Dashboard_Year")
             year_summary["Year_Label"] = year_summary["Dashboard_Year"].astype(str)
+
+
 
             fig_year = px.bar(
                 year_summary,
@@ -1262,12 +1612,16 @@ if uploaded_file:
                 title="Total Reviews by Year"
             )
 
+
+
             fig_year.update_traces(
                 marker_color="#25B6C8",
                 textposition="outside",
                 textfont=dict(color=PLOT_FONT_COLOR, size=13),
                 cliponaxis=False
             )
+
+
 
             fig_year.update_layout(
                 template=PLOT_TEMPLATE,
@@ -1301,21 +1655,33 @@ if uploaded_file:
                 showlegend=False
             )
 
+
+
             st.plotly_chart(fig_year, width="stretch")
+
+
 
     with time_col2:
         year_rating_df = analysis_df.dropna(subset=["Dashboard_Year", rating_col]).copy()
+
+
 
         if not year_rating_df.empty:
             avg_year_summary = year_rating_df.groupby("Dashboard_Year").agg(
                 Avg_Rating=(rating_col, "mean")
             ).reset_index()
 
+
+
             avg_year_summary["Dashboard_Year"] = avg_year_summary["Dashboard_Year"].astype(int)
             avg_year_summary = avg_year_summary.sort_values("Dashboard_Year")
             avg_year_summary["Year_Label"] = avg_year_summary["Dashboard_Year"].astype(str)
 
+
+
             fig_avg_year = go.Figure()
+
+
 
             fig_avg_year.add_trace(go.Scatter(
                 x=avg_year_summary["Year_Label"],
@@ -1328,6 +1694,8 @@ if uploaded_file:
                 textfont=dict(color=PLOT_FONT_COLOR, size=13),
                 name="Avg Rating"
             ))
+
+
 
             fig_avg_year.update_layout(
                 template=PLOT_TEMPLATE,
@@ -1362,23 +1730,37 @@ if uploaded_file:
                 showlegend=False
             )
 
+
+
             st.plotly_chart(fig_avg_year, width="stretch")
+
+
 
     quarter_col1, quarter_col2 = st.columns(2)
 
+
+
     with quarter_col1:
         quarter_df = analysis_df.dropna(subset=["Dashboard_Quarter"]).copy()
+
+
 
         if not quarter_df.empty:
             quarter_summary = quarter_df.groupby("Dashboard_Quarter").agg(
                 Total_Reviews=("Dashboard_Quarter", "count")
             ).reset_index()
 
+
+
             quarter_summary["Quarter_Order"] = quarter_summary["Dashboard_Quarter"].map(
                 {"Q1": 1, "Q2": 2, "Q3": 3, "Q4": 4}
             )
 
+
+
             quarter_summary = quarter_summary.sort_values("Quarter_Order")
+
+
 
             fig_quarter = px.bar(
                 quarter_summary,
@@ -1388,12 +1770,16 @@ if uploaded_file:
                 title="Total Reviews by Quarter"
             )
 
+
+
             fig_quarter.update_traces(
                 marker_color="#25B6C8",
                 textposition="outside",
                 textfont=dict(color=PLOT_FONT_COLOR, size=13),
                 cliponaxis=False
             )
+
+
 
             fig_quarter.update_layout(
                 template=PLOT_TEMPLATE,
@@ -1424,14 +1810,22 @@ if uploaded_file:
                 showlegend=False
             )
 
+
+
             st.plotly_chart(fig_quarter, width="stretch")
+
+
 
     with quarter_col2:
         rating_dist = analysis_df.dropna(subset=[rating_col]).copy()
 
+
+
         if not rating_dist.empty:
             rating_summary = rating_dist.groupby(rating_col).size().reset_index(name="Total_Reviews")
             rating_summary = rating_summary.sort_values(rating_col)
+
+
 
             fig_rating = px.bar(
                 rating_summary,
@@ -1441,12 +1835,16 @@ if uploaded_file:
                 title="Total Reviews by Rating"
             )
 
+
+
             fig_rating.update_traces(
                 marker_color="#25B6C8",
                 textposition="outside",
                 textfont=dict(color=PLOT_FONT_COLOR, size=13),
                 cliponaxis=False
             )
+
+
 
             fig_rating.update_layout(
                 template=PLOT_TEMPLATE,
@@ -1477,23 +1875,37 @@ if uploaded_file:
                 showlegend=False
             )
 
+
+
             st.plotly_chart(fig_rating, width="stretch")
 
+
+
     st.markdown("---")
+
+
 
     # =========================
     # Reviews & Avg Rating by Theme
     # =========================
     st.subheader("📊 Reviews & Avg Rating by Theme")
 
+
+
     theme_summary = analysis_df.groupby(theme_col).agg(
         Total_Reviews=(theme_col, "count"),
         Avg_Rating=(rating_col, "mean")
     ).reset_index()
 
+
+
     theme_summary = theme_summary.sort_values(by="Total_Reviews", ascending=False)
 
+
+
     fig_theme = go.Figure()
+
+
 
     fig_theme.add_trace(go.Bar(
         x=theme_summary[theme_col].astype(str),
@@ -1508,6 +1920,8 @@ if uploaded_file:
         hovertemplate="<b>%{x}</b><br>Total Reviews: %{y:,}<extra></extra>"
     ))
 
+
+
     fig_theme.add_trace(go.Scatter(
         x=theme_summary[theme_col].astype(str),
         y=theme_summary["Avg_Rating"],
@@ -1521,6 +1935,8 @@ if uploaded_file:
         textfont=dict(color=PLOT_FONT_COLOR, size=14),
         hovertemplate="<b>%{x}</b><br>Avg Rating: %{y:.2f}<extra></extra>"
     ))
+
+
 
     fig_theme.update_layout(
         template=PLOT_TEMPLATE,
@@ -1574,20 +1990,32 @@ if uploaded_file:
         margin=dict(t=105, b=125, l=80, r=80)
     )
 
+
+
     st.plotly_chart(fig_theme, width="stretch")
 
+
+
     st.markdown("---")
+
+
 
     # =========================
     # Sentiment & Language
     # =========================
     colA, colB = st.columns(2)
 
+
+
     with colA:
         st.subheader("😊 Sentiment Distribution")
 
+
+
         sentiment_data = analysis_df["Sentiment_Clean"].value_counts().reset_index()
         sentiment_data.columns = ["Sentiment", "Count"]
+
+
 
         fig_sent = px.bar(
             sentiment_data,
@@ -1602,11 +2030,15 @@ if uploaded_file:
             }
         )
 
+
+
         fig_sent.update_traces(
             textposition="outside",
             textfont=dict(size=14, color=PLOT_FONT_COLOR),
             cliponaxis=False
         )
+
+
 
         fig_sent.update_layout(
             template=PLOT_TEMPLATE,
@@ -1644,13 +2076,21 @@ if uploaded_file:
             paper_bgcolor=PLOT_BG_COLOR
         )
 
+
+
         st.plotly_chart(fig_sent, width="stretch")
+
+
 
     with colB:
         st.subheader("🌐 Language Distribution")
 
+
+
         lang_data = analysis_df[language_col].value_counts().reset_index()
         lang_data.columns = ["Language", "Count"]
+
+
 
         fig_lang = px.pie(
             lang_data,
@@ -1660,10 +2100,14 @@ if uploaded_file:
             color="Language"
         )
 
+
+
         fig_lang.update_traces(
             textinfo="percent+label",
             textfont=dict(size=15, color=PLOT_FONT_COLOR)
         )
+
+
 
         fig_lang.update_layout(
             template=PLOT_TEMPLATE,
@@ -1682,21 +2126,35 @@ if uploaded_file:
             showlegend=True
         )
 
+
+
         st.plotly_chart(fig_lang, width="stretch")
 
+
+
     st.markdown("---")
+
+
 
     # =========================
     # Negative Reviews by Theme
     # =========================
     st.subheader("🔥 Negative Reviews by Theme")
 
+
+
     neg_df = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
+
+
 
     neg_theme = neg_df.groupby(theme_col).size().reset_index(name="Negative Reviews")
     neg_theme = neg_theme.sort_values(by="Negative Reviews", ascending=False)
 
+
+
     total_neg = len(neg_df)
+
+
 
     if total_neg > 0:
         neg_theme["Label"] = neg_theme["Negative Reviews"].apply(
@@ -1705,9 +2163,15 @@ if uploaded_file:
     else:
         neg_theme["Label"] = "0"
 
+
+
     colors = ["#7F1D1D"] + ["#DC2626"] * (len(neg_theme) - 1)
 
+
+
     fig_neg = go.Figure()
+
+
 
     fig_neg.add_trace(go.Bar(
         x=neg_theme["Negative Reviews"],
@@ -1722,7 +2186,11 @@ if uploaded_file:
         hovertemplate="<b>%{y}</b><br>Negative Reviews: %{x:,}<extra></extra>"
     ))
 
+
+
     max_neg = neg_theme["Negative Reviews"].max() if len(neg_theme) > 0 else 1
+
+
 
     fig_neg.update_layout(
         template=PLOT_TEMPLATE,
@@ -1756,17 +2224,27 @@ if uploaded_file:
         showlegend=False
     )
 
+
+
     st.plotly_chart(fig_neg, width="stretch")
 
+
+
     st.markdown("---")
+
+
 
     # =========================
     # Top Subthemes
     # =========================
     st.subheader("🧩 Top Subthemes")
 
+
+
     sub_data = analysis_df[subtheme_col].value_counts().head(20).reset_index()
     sub_data.columns = ["Subtheme", "Count"]
+
+
 
     fig_sub = px.bar(
         sub_data,
@@ -1778,13 +2256,19 @@ if uploaded_file:
         color_continuous_scale="Teal"
     )
 
+
+
     fig_sub.update_traces(
         textposition="outside",
         textfont=dict(size=14, color=PLOT_FONT_COLOR),
         cliponaxis=False
     )
 
+
+
     max_sub = sub_data["Count"].max() if len(sub_data) > 0 else 1
+
+
 
     fig_sub.update_layout(
         template=PLOT_TEMPLATE,
@@ -1824,9 +2308,15 @@ if uploaded_file:
         margin=dict(l=100, r=170, t=70, b=50)
     )
 
+
+
     st.plotly_chart(fig_sub, width="stretch")
 
+
+
     st.markdown("---")
+
+
 
     # =========================
     # Full Filtered Data
@@ -1834,14 +2324,22 @@ if uploaded_file:
     st.subheader("📄 Filtered Reviews Data")
     st.caption("Showing all filtered and anonymized rows so you can read the reviews based on the selected filters.")
 
+
+
     full_filtered_df = analysis_source_df.copy()
     full_filtered_df = remove_private_columns(full_filtered_df)
     full_filtered_df.insert(0, "Review_ID", range(1, len(full_filtered_df) + 1))
     full_filtered_df = full_filtered_df.reset_index(drop=True)
 
+
+
     st.dataframe(full_filtered_df, width="stretch", hide_index=True)
 
+
+
     excel_file = convert_df_to_excel(full_filtered_df)
+
+
 
     st.download_button(
         label="⬇️ Download filtered reviews as Excel",
