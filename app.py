@@ -27,44 +27,30 @@ def get_logo_html():
 
     if logo_path.exists():
         logo_base64 = base64.b64encode(logo_path.read_bytes()).decode()
-        return f"""
-        <img src="data:image/png;base64,{logo_base64}"
-             style="width:78px; height:78px; object-fit:contain; margin-right:20px;">
-        """
-    else:
-        return """
-        <div style="font-size:60px; margin-right:20px;">📊</div>
-        """
+        return (
+            f'<img src="data:image/png;base64,{logo_base64}" '
+            f'style="width:78px; height:78px; object-fit:contain; margin-right:20px;">'
+        )
+
+    return '<div style="font-size:60px; margin-right:20px;">📊</div>'
 
 
 # =========================
 # Header Design
 # =========================
-st.markdown(
-    f"""
-    <div style="
-        padding: 28px 30px;
-        border-radius: 22px;
-        background: linear-gradient(135deg, #0891B2, #0F766E);
-        color: white;
-        margin-bottom: 25px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-        display: flex;
-        align-items: center;
-    ">
-        {get_logo_html()}
-        <div>
-            <h1 style="margin-bottom: 8px; font-size: 42px;">
-                Sehhaty Smart Feedback Intelligence Platform
-            </h1>
-            <p style="font-size: 19px; margin: 0;">
-                An interactive dashboard for analyzing Sehhaty app reviews by sentiment, themes, subthemes, language, and rating.
-            </p>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+logo_html = get_logo_html()
+
+header_html = f"""
+<div style="padding:28px 30px; border-radius:22px; background:linear-gradient(135deg, #0891B2, #0F766E); color:white; margin-bottom:25px; box-shadow:0 10px 30px rgba(0,0,0,0.18); display:flex; align-items:center;">
+{logo_html}
+<div>
+<h1 style="margin-bottom:8px; font-size:42px;">Sehhaty Smart Feedback Intelligence Platform</h1>
+<p style="font-size:19px; margin:0;">An interactive dashboard for analyzing Sehhaty app reviews by sentiment, themes, subthemes, language, and rating.</p>
+</div>
+</div>
+"""
+
+st.markdown(header_html, unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader("📂 Upload Excel file", type=["xlsx"])
 
@@ -279,8 +265,8 @@ if uploaded_file:
                 zeroline=False,
                 tickfont=dict(color=PLOT_FONT_COLOR)
             ),
-            plot_bgcolor="#FFFFFF",
-            paper_bgcolor="#FFFFFF",
+            plot_bgcolor=PLOT_BG_COLOR,
+            paper_bgcolor=PLOT_BG_COLOR,
             margin=dict(t=105, b=115, l=70, r=70)
         )
 
@@ -331,8 +317,8 @@ if uploaded_file:
                     showgrid=False,
                     tickfont=dict(color=PLOT_FONT_COLOR)
                 ),
-                plot_bgcolor="#FFFFFF",
-                paper_bgcolor="#FFFFFF"
+                plot_bgcolor=PLOT_BG_COLOR,
+                paper_bgcolor=PLOT_BG_COLOR
             )
 
             st.plotly_chart(fig_sent, use_container_width=True)
@@ -361,8 +347,8 @@ if uploaded_file:
                 height=480,
                 font=dict(color=PLOT_FONT_COLOR),
                 legend=dict(font=dict(color=PLOT_FONT_COLOR)),
-                plot_bgcolor="#FFFFFF",
-                paper_bgcolor="#FFFFFF",
+                plot_bgcolor=PLOT_BG_COLOR,
+                paper_bgcolor=PLOT_BG_COLOR,
                 showlegend=True
             )
 
@@ -424,8 +410,8 @@ if uploaded_file:
                 showgrid=False,
                 tickfont=dict(color=PLOT_FONT_COLOR)
             ),
-            plot_bgcolor="#FFFFFF",
-            paper_bgcolor="#FFFFFF",
+            plot_bgcolor=PLOT_BG_COLOR,
+            paper_bgcolor=PLOT_BG_COLOR,
             margin=dict(l=90, r=150, t=40, b=40),
             showlegend=False
         )
@@ -474,8 +460,8 @@ if uploaded_file:
                 categoryorder="total ascending",
                 tickfont=dict(color=PLOT_FONT_COLOR)
             ),
-            plot_bgcolor="#FFFFFF",
-            paper_bgcolor="#FFFFFF",
+            plot_bgcolor=PLOT_BG_COLOR,
+            paper_bgcolor=PLOT_BG_COLOR,
             margin=dict(r=160)
         )
 
