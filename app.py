@@ -359,6 +359,25 @@ div[data-baseweb="select"] * {
     color: #FFFFFF !important;
 }
 
+/* تغيير لون الخيارات المختارة بدل الأحمر */
+div[data-baseweb="tag"] {
+    background: linear-gradient(135deg, #0F766E, #0C848F) !important;
+    border: 1px solid rgba(255,255,255,0.35) !important;
+    border-radius: 10px !important;
+    color: white !important;
+    box-shadow: 0 0 10px rgba(255,255,255,0.15) !important;
+}
+
+div[data-baseweb="tag"] span {
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+div[data-baseweb="tag"] svg {
+    fill: #E5E7EB !important;
+    color: #E5E7EB !important;
+}
+
 /* السهم الداخلي الأصلي نخليه فضي */
 div[data-baseweb="select"] svg {
     fill: #E5E7EB !important;
@@ -415,7 +434,8 @@ div[data-baseweb="select"] svg {
         selected_years = st.multiselect(
             "Review Year",
             options=year_options,
-            default=year_options,
+            default=[],
+            placeholder="All years",
             key="filter_years"
         )
         st.markdown('</div>', unsafe_allow_html=True)
@@ -425,7 +445,8 @@ div[data-baseweb="select"] svg {
         selected_quarters = st.multiselect(
             "Quarter",
             options=quarter_options,
-            default=quarter_options,
+            default=[],
+            placeholder="All quarters",
             key="filter_quarters"
         )
         st.markdown('</div>', unsafe_allow_html=True)
@@ -435,7 +456,8 @@ div[data-baseweb="select"] svg {
         selected_months = st.multiselect(
             "Month",
             options=month_options,
-            default=month_options,
+            default=[],
+            placeholder="All months",
             key="filter_months"
         )
         st.markdown('</div>', unsafe_allow_html=True)
@@ -445,7 +467,8 @@ div[data-baseweb="select"] svg {
         selected_ratings = st.multiselect(
             "Rating",
             options=rating_options,
-            default=rating_options,
+            default=[],
+            placeholder="All ratings",
             key="filter_ratings"
         )
         st.markdown('</div>', unsafe_allow_html=True)
@@ -457,7 +480,8 @@ div[data-baseweb="select"] svg {
         selected_languages = st.multiselect(
             "Language",
             options=language_options,
-            default=language_options,
+            default=[],
+            placeholder="All languages",
             key="filter_languages"
         )
         st.markdown('</div>', unsafe_allow_html=True)
@@ -467,7 +491,8 @@ div[data-baseweb="select"] svg {
         selected_sentiments = st.multiselect(
             "Sentiment",
             options=sentiment_options,
-            default=sentiment_options,
+            default=[],
+            placeholder="All sentiments",
             key="filter_sentiments"
         )
         st.markdown('</div>', unsafe_allow_html=True)
@@ -477,7 +502,8 @@ div[data-baseweb="select"] svg {
         selected_themes = st.multiselect(
             "Theme",
             options=theme_options,
-            default=theme_options,
+            default=[],
+            placeholder="All themes",
             key="filter_themes"
         )
         st.markdown('</div>', unsafe_allow_html=True)
@@ -487,7 +513,8 @@ div[data-baseweb="select"] svg {
         selected_subthemes = st.multiselect(
             "Subtheme",
             options=subtheme_options,
-            default=subtheme_options,
+            default=[],
+            placeholder="All subthemes",
             key="filter_subthemes"
         )
         st.markdown('</div>', unsafe_allow_html=True)
@@ -500,7 +527,7 @@ div[data-baseweb="select"] svg {
             st.rerun()
 
     with info_col:
-        st.caption("Changing any filter updates all KPI cards, insights, charts, and data preview automatically.")
+        st.caption("No selection means All. Changing any filter updates all KPI cards, insights, charts, and data preview automatically.")
 
     def apply_dashboard_filters(dataframe):
         result = dataframe.copy()
@@ -542,6 +569,20 @@ div[data-baseweb="select"] svg {
     if analysis_df.empty:
         st.warning("⚠️ No data available for the selected filters. Please adjust the filters.")
         st.stop()
+
+    # =========================
+    # Data Preview at the Top
+    # =========================
+    st.markdown("---")
+    st.subheader("🔍 Data Preview")
+    st.caption("Showing a filtered preview with usernames removed for privacy.")
+
+    preview_df = analysis_source_df.head(5).copy()
+    preview_df = remove_private_columns(preview_df)
+    preview_df.insert(0, "Review_ID", range(1, len(preview_df) + 1))
+    preview_df = preview_df.reset_index(drop=True)
+
+    st.dataframe(preview_df, width="stretch", hide_index=True)
 
     st.success("✅ Analysis Completed!")
 
@@ -707,21 +748,6 @@ div[data-baseweb="select"] svg {
 <div class="insight-grid"><div class="insight-card"><span class="insight-icon">📅</span><div class="insight-title">Most Active Year</div><div class="insight-value">{top_year_text}</div></div><div class="insight-card"><span class="insight-icon">⭐</span><div class="insight-title">Best Avg Rating Year</div><div class="insight-value">{best_year_text}</div></div><div class="insight-card"><span class="insight-icon">🏆</span><div class="insight-title">Top Theme</div><div class="insight-value">{top_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🔥</span><div class="insight-title">Most Negative Theme</div><div class="insight-value">{negative_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🧩</span><div class="insight-title">Top Subtheme</div><div class="insight-value">{top_subtheme_text}</div></div><div class="insight-card"><span class="insight-icon">📉</span><div class="insight-title">Negative Reviews Rate</div><div class="insight-value">{negative_rate_text}</div></div></div>
 """
     st.markdown(insights_html, unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # =========================
-    # Data Preview
-    # =========================
-    st.subheader("🔍 Data Preview")
-    st.caption("Showing a filtered preview with usernames removed for privacy.")
-
-    preview_df = analysis_source_df.head(5).copy()
-    preview_df = remove_private_columns(preview_df)
-    preview_df.insert(0, "Review_ID", range(1, len(preview_df) + 1))
-    preview_df = preview_df.reset_index(drop=True)
-
-    st.dataframe(preview_df, width="stretch", hide_index=True)
 
     st.markdown("---")
 
@@ -1319,14 +1345,14 @@ div[data-baseweb="select"] svg {
     st.markdown("---")
 
     # =========================
-    # Data Sample
+    # Full Filtered Data
     # =========================
-    st.subheader("📄 Data Sample")
-    st.caption("Showing a sample of 20 anonymized rows only for faster performance.")
+    st.subheader("📄 Filtered Reviews Data")
+    st.caption("Showing all filtered and anonymized rows so you can read the reviews based on the selected filters.")
 
-    sample_df = analysis_df.head(20).copy()
-    sample_df.insert(0, "Review_ID", range(1, len(sample_df) + 1))
-    sample_df = remove_private_columns(sample_df)
-    sample_df = sample_df.reset_index(drop=True)
+    full_filtered_df = analysis_source_df.copy()
+    full_filtered_df = remove_private_columns(full_filtered_df)
+    full_filtered_df.insert(0, "Review_ID", range(1, len(full_filtered_df) + 1))
+    full_filtered_df = full_filtered_df.reset_index(drop=True)
 
-    st.dataframe(sample_df, width="stretch", hide_index=True)
+    st.dataframe(full_filtered_df, width="stretch", hide_index=True)
