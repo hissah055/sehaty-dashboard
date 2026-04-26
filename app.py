@@ -15,8 +15,8 @@ st.set_page_config(
 # Fixed Plot Style
 # =========================
 PLOT_TEMPLATE = "plotly_white"
-PLOT_FONT_COLOR = "#000000"
-PLOT_BG_COLOR = "#DDF3E4"   # Soft green chart background
+PLOT_FONT_COLOR = "#FFFFFF"
+PLOT_BG_COLOR = "#0C848F"   # Teal chart background matching the main header
 PLOT_AXIS_TITLE_SIZE = 20
 PLOT_TICK_SIZE = 15
 PLOT_TITLE_SIZE = 24
