@@ -22,12 +22,13 @@ st.markdown(
         --accent-main: #0891B2;
         --accent-dark: #0F766E;
         --label-color: #22D3EE;
-        --helper-color: #AFC0D4;
+        --helper-color: #D1D9E6;
         --text-dark: #111827;
         --placeholder-color: #64748B;
         --box-border: #CBD5E1;
         --hover-bg: #E0F2FE;
         --selected-bg: #CCFBF1;
+        --menu-bg: #FFFFFF;
     }
 
     /* Green progress bar */
@@ -65,31 +66,15 @@ st.markdown(
     /* Captions / helper text */
     .stCaption,
     [data-testid="stCaptionContainer"],
-    [data-testid="stCaptionContainer"] p {
+    [data-testid="stCaptionContainer"] p,
+    small {
         color: var(--helper-color) !important;
         font-weight: 650 !important;
     }
 
-    /* Sidebar select boxes */
+    /* Main select boxes + sidebar select boxes */
+    div[data-baseweb="select"] > div,
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div {
-        background: #FFFFFF !important;
-        border: 1px solid var(--box-border) !important;
-        border-radius: 16px !important;
-        color: var(--text-dark) !important;
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10) !important;
-    }
-
-    section[data-testid="stSidebar"] div[data-baseweb="select"] * {
-        color: var(--text-dark) !important;
-    }
-
-    section[data-testid="stSidebar"] div[data-baseweb="select"] svg {
-        fill: var(--accent-dark) !important;
-        color: var(--accent-dark) !important;
-    }
-
-    /* Main filter boxes */
-    div[data-baseweb="select"] > div {
         background: #FFFFFF !important;
         border: 1px solid var(--box-border) !important;
         border-radius: 16px !important;
@@ -98,11 +83,13 @@ st.markdown(
         box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10) !important;
     }
 
-    div[data-baseweb="select"] * {
+    div[data-baseweb="select"] *,
+    section[data-testid="stSidebar"] div[data-baseweb="select"] * {
         color: var(--text-dark) !important;
     }
 
-    div[data-baseweb="select"] svg {
+    div[data-baseweb="select"] svg,
+    section[data-testid="stSidebar"] div[data-baseweb="select"] svg {
         fill: var(--accent-dark) !important;
         color: var(--accent-dark) !important;
         filter: drop-shadow(0 0 3px rgba(15,118,110,0.25));
@@ -127,42 +114,67 @@ st.markdown(
         color: white !important;
     }
 
-    /* Dropdown popover background */
+    /* Force dropdown menu white in dark mode */
     div[data-baseweb="popover"] {
-        background: #FFFFFF !important;
+        background: transparent !important;
         color: var(--text-dark) !important;
     }
 
-    div[data-baseweb="popover"] * {
+    div[data-baseweb="popover"] > div,
+    div[data-baseweb="popover"] > div > div,
+    div[data-baseweb="popover"] > div > div > div,
+    div[data-baseweb="popover"] div {
+        background-color: var(--menu-bg) !important;
         color: var(--text-dark) !important;
     }
 
-    /* Dropdown menu itself */
-    div[role="listbox"] {
-        background: #FFFFFF !important;
+    div[role="listbox"],
+    ul[role="listbox"],
+    div[data-baseweb="menu"],
+    div[data-baseweb="popover"] ul,
+    div[data-baseweb="popover"] li {
+        background-color: var(--menu-bg) !important;
         color: var(--text-dark) !important;
         border-radius: 12px !important;
     }
 
-    /* Dropdown options */
-    div[role="option"] {
-        background: #FFFFFF !important;
+    div[role="option"],
+    li[role="option"] {
+        background-color: var(--menu-bg) !important;
+        color: var(--text-dark) !important;
+        font-weight: 600 !important;
+    }
+
+    div[role="option"] *,
+    li[role="option"] * {
+        color: var(--text-dark) !important;
+        background-color: transparent !important;
+    }
+
+    div[role="option"]:hover,
+    li[role="option"]:hover {
+        background-color: var(--hover-bg) !important;
         color: var(--text-dark) !important;
     }
 
-    div[role="option"]:hover {
-        background: var(--hover-bg) !important;
+    div[role="option"]:hover *,
+    li[role="option"]:hover * {
         color: var(--text-dark) !important;
     }
 
-    div[aria-selected="true"] {
-        background: var(--selected-bg) !important;
+    div[aria-selected="true"],
+    li[aria-selected="true"] {
+        background-color: var(--selected-bg) !important;
         color: var(--text-dark) !important;
     }
 
-    /* Search input inside dropdown */
+    div[aria-selected="true"] *,
+    li[aria-selected="true"] * {
+        color: var(--text-dark) !important;
+    }
+
     div[data-baseweb="popover"] input {
-        background: #F8FAFC !important;
+        background-color: #F8FAFC !important;
         color: var(--text-dark) !important;
         border: 1px solid var(--box-border) !important;
         border-radius: 10px !important;
@@ -174,7 +186,13 @@ st.markdown(
         opacity: 1 !important;
     }
 
-    /* Buttons */
+    div[data-baseweb="popover"] input[value],
+    div[data-baseweb="popover"] label,
+    div[data-baseweb="popover"] span,
+    div[data-baseweb="popover"] p {
+        color: var(--text-dark) !important;
+    }
+
     div.stButton > button[kind="primary"] {
         background: linear-gradient(135deg, var(--accent-main), var(--accent-dark)) !important;
         color: white !important;
