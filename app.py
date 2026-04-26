@@ -1,6 +1,5 @@
 import base64
 from pathlib import Path
-from textwrap import dedent
 
 import streamlit as st
 import pandas as pd
@@ -413,90 +412,58 @@ if uploaded_file:
         # =========================
         # KPI Metric Cards
         # =========================
-        st.markdown(dedent(f"""
-        <style>
-        .metric-grid {{
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 16px;
-            margin-top: 14px;
-            margin-bottom: 10px;
-        }}
-
-        .metric-card {{
-            background: linear-gradient(135deg, #0F766E, #0C848F);
-            border-radius: 18px;
-            padding: 20px 18px;
-            color: white;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.20);
-            border: 1px solid rgba(255,255,255,0.14);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            min-height: 120px;
-        }}
-
-        .metric-card:hover {{
-            transform: translateY(-4px);
-            box-shadow: 0 14px 28px rgba(0,0,0,0.28);
-        }}
-
-        .metric-label {{
-            font-size: 16px;
-            font-weight: 600;
-            opacity: 0.92;
-            margin-bottom: 10px;
-        }}
-
-        .metric-value {{
-            font-size: 30px;
-            font-weight: 850;
-            line-height: 1.2;
-        }}
-
-        .metric-icon {{
-            font-size: 24px;
-            margin-right: 8px;
-        }}
-
-        @media (max-width: 1100px) {{
-            .metric-grid {{
-                grid-template-columns: repeat(2, 1fr);
-            }}
-        }}
-
-        @media (max-width: 700px) {{
-            .metric-grid {{
-                grid-template-columns: repeat(1, 1fr);
-            }}
-        }}
-        </style>
-
-        <div class="metric-grid">
-            <div class="metric-card">
-                <div class="metric-label"><span class="metric-icon">📝</span>Total Reviews</div>
-                <div class="metric-value">{total_reviews:,}</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-label"><span class="metric-icon">⭐</span>Avg Rating</div>
-                <div class="metric-value">{avg_rating:.2f}</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-label"><span class="metric-icon">😊</span>Positive</div>
-                <div class="metric-value">{positive_count:,}</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-label"><span class="metric-icon">😟</span>Negative</div>
-                <div class="metric-value">{negative_count:,}</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-label"><span class="metric-icon">😐</span>Neutral</div>
-                <div class="metric-value">{neutral_count:,}</div>
-            </div>
-        </div>
-        """), unsafe_allow_html=True)
+        metric_cards_html = f"""
+<style>
+.metric-grid {{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-top: 14px;
+    margin-bottom: 10px;
+}}
+.metric-card {{
+    background: linear-gradient(135deg, #0F766E, #0C848F);
+    border-radius: 18px;
+    padding: 20px 18px;
+    color: white;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.20);
+    border: 1px solid rgba(255,255,255,0.14);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    min-height: 120px;
+}}
+.metric-card:hover {{
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.28);
+}}
+.metric-label {{
+    font-size: 16px;
+    font-weight: 700;
+    opacity: 0.95;
+    margin-bottom: 10px;
+}}
+.metric-value {{
+    font-size: 30px;
+    font-weight: 850;
+    line-height: 1.2;
+}}
+.metric-icon {{
+    font-size: 24px;
+    margin-right: 8px;
+}}
+@media (max-width: 1100px) {{
+    .metric-grid {{
+        grid-template-columns: repeat(2, 1fr);
+    }}
+}}
+@media (max-width: 700px) {{
+    .metric-grid {{
+        grid-template-columns: repeat(1, 1fr);
+    }}
+}}
+</style>
+<div class="metric-grid"><div class="metric-card"><div class="metric-label"><span class="metric-icon">📝</span>Total Reviews</div><div class="metric-value">{total_reviews:,}</div></div><div class="metric-card"><div class="metric-label"><span class="metric-icon">⭐</span>Avg Rating</div><div class="metric-value">{avg_rating:.2f}</div></div><div class="metric-card"><div class="metric-label"><span class="metric-icon">😊</span>Positive</div><div class="metric-value">{positive_count:,}</div></div><div class="metric-card"><div class="metric-label"><span class="metric-icon">😟</span>Negative</div><div class="metric-value">{negative_count:,}</div></div><div class="metric-card"><div class="metric-label"><span class="metric-icon">😐</span>Neutral</div><div class="metric-value">{neutral_count:,}</div></div></div>
+"""
+        st.markdown(metric_cards_html, unsafe_allow_html=True)
 
         # =========================
         # Smart Insights Summary
@@ -543,114 +510,56 @@ if uploaded_file:
             negative_rate = (negative_count / len(analysis_df)) * 100
             negative_rate_text = f"{negative_rate:.1f}%"
 
-        st.markdown(dedent("""
-        <style>
-        .insight-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-top: 18px;
-            margin-bottom: 18px;
-        }
-
-        .insight-card {
-            background: linear-gradient(135deg, #0F766E, #0C848F);
-            padding: 22px 24px;
-            border-radius: 20px;
-            color: white;
-            box-shadow: 0 10px 28px rgba(0,0,0,0.22);
-            border: 1px solid rgba(255,255,255,0.22);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
-            animation: fadeInUp 0.6s ease both;
-            min-height: 145px;
-            overflow-wrap: anywhere;
-        }
-
-        .insight-card:hover {
-            transform: translateY(-7px) scale(1.015);
-            box-shadow: 0 16px 36px rgba(0,0,0,0.32);
-            border: 1px solid rgba(255,255,255,0.45);
-        }
-
-        .insight-icon {
-            font-size: 34px;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .insight-title {
-            font-size: 15px;
-            font-weight: 700;
-            opacity: 0.9;
-            margin-bottom: 8px;
-        }
-
-        .insight-value {
-            font-size: 23px;
-            font-weight: 850;
-            line-height: 1.25;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 900px) {
-            .insight-grid {
-                grid-template-columns: repeat(1, 1fr);
-            }
-        }
-        </style>
-        """), unsafe_allow_html=True)
-
-        st.markdown(dedent(f"""
-        <div class="insight-grid">
-
-            <div class="insight-card">
-                <span class="insight-icon">📅</span>
-                <div class="insight-title">Most Active Year</div>
-                <div class="insight-value">{top_year_text}</div>
-            </div>
-
-            <div class="insight-card">
-                <span class="insight-icon">⭐</span>
-                <div class="insight-title">Best Avg Rating Year</div>
-                <div class="insight-value">{best_year_text}</div>
-            </div>
-
-            <div class="insight-card">
-                <span class="insight-icon">🏆</span>
-                <div class="insight-title">Top Theme</div>
-                <div class="insight-value">{top_theme_text}</div>
-            </div>
-
-            <div class="insight-card">
-                <span class="insight-icon">🔥</span>
-                <div class="insight-title">Most Negative Theme</div>
-                <div class="insight-value">{negative_theme_text}</div>
-            </div>
-
-            <div class="insight-card">
-                <span class="insight-icon">🧩</span>
-                <div class="insight-title">Top Subtheme</div>
-                <div class="insight-value">{top_subtheme_text}</div>
-            </div>
-
-            <div class="insight-card">
-                <span class="insight-icon">📉</span>
-                <div class="insight-title">Negative Reviews Rate</div>
-                <div class="insight-value">{negative_rate_text}</div>
-            </div>
-
-        </div>
-        """), unsafe_allow_html=True)
+        insights_html = f"""
+<style>
+.insight-grid {{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+}}
+.insight-card {{
+    background: linear-gradient(135deg, #0F766E, #0C848F);
+    padding: 22px 24px;
+    border-radius: 20px;
+    color: white;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+    border: 1px solid rgba(255,255,255,0.22);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
+    min-height: 145px;
+    overflow-wrap: anywhere;
+}}
+.insight-card:hover {{
+    transform: translateY(-7px) scale(1.015);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.32);
+    border: 1px solid rgba(255,255,255,0.45);
+}}
+.insight-icon {{
+    font-size: 34px;
+    margin-bottom: 10px;
+    display: block;
+}}
+.insight-title {{
+    font-size: 15px;
+    font-weight: 700;
+    opacity: 0.9;
+    margin-bottom: 8px;
+}}
+.insight-value {{
+    font-size: 23px;
+    font-weight: 850;
+    line-height: 1.25;
+}}
+@media (max-width: 900px) {{
+    .insight-grid {{
+        grid-template-columns: repeat(1, 1fr);
+    }}
+}}
+</style>
+<div class="insight-grid"><div class="insight-card"><span class="insight-icon">📅</span><div class="insight-title">Most Active Year</div><div class="insight-value">{top_year_text}</div></div><div class="insight-card"><span class="insight-icon">⭐</span><div class="insight-title">Best Avg Rating Year</div><div class="insight-value">{best_year_text}</div></div><div class="insight-card"><span class="insight-icon">🏆</span><div class="insight-title">Top Theme</div><div class="insight-value">{top_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🔥</span><div class="insight-title">Most Negative Theme</div><div class="insight-value">{negative_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🧩</span><div class="insight-title">Top Subtheme</div><div class="insight-value">{top_subtheme_text}</div></div><div class="insight-card"><span class="insight-icon">📉</span><div class="insight-title">Negative Reviews Rate</div><div class="insight-value">{negative_rate_text}</div></div></div>
+"""
+        st.markdown(insights_html, unsafe_allow_html=True)
 
         st.markdown("---")
 
