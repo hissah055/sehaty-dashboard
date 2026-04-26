@@ -15,8 +15,11 @@ st.set_page_config(
 # Fixed Plot Style
 # =========================
 PLOT_TEMPLATE = "plotly_white"
-PLOT_FONT_COLOR = "#1F2937"
+PLOT_FONT_COLOR = "#000000"
 PLOT_BG_COLOR = "#FFFFFF"
+PLOT_AXIS_TITLE_SIZE = 20
+PLOT_TICK_SIZE = 15
+PLOT_TITLE_SIZE = 24
 
 
 # =========================
@@ -187,6 +190,9 @@ if uploaded_file:
 
         st.markdown("---")
 
+        # =========================
+        # Reviews & Avg Rating by Theme
+        # =========================
         st.subheader("📊 Reviews & Avg Rating by Theme")
 
         theme_summary = analysis_df.groupby(theme_col).agg(
@@ -206,7 +212,7 @@ if uploaded_file:
             text=theme_summary["Total_Reviews"],
             texttemplate="%{text:,}",
             textposition="outside",
-            textfont=dict(size=11, color="#374151"),
+            textfont=dict(size=12, color=PLOT_FONT_COLOR),
             cliponaxis=False,
             hovertemplate="<b>%{x}</b><br>Total Reviews: %{y:,}<extra></extra>"
         ))
@@ -221,53 +227,68 @@ if uploaded_file:
             marker=dict(size=11, color="#FF8A00"),
             text=[f"{v:.2f}" for v in theme_summary["Avg_Rating"]],
             textposition=["bottom center"] + ["top center"] * (len(theme_summary) - 1),
-            textfont=dict(color="#111827", size=13),
+            textfont=dict(color=PLOT_FONT_COLOR, size=14),
             hovertemplate="<b>%{x}</b><br>Avg Rating: %{y:.2f}<extra></extra>"
         ))
 
         fig_theme.update_layout(
             template=PLOT_TEMPLATE,
-            height=580,
-            title="Reviews & Avg Rating by Theme",
+            height=590,
+            title=dict(
+                text="Reviews & Avg Rating by Theme",
+                font=dict(size=PLOT_TITLE_SIZE, color=PLOT_FONT_COLOR)
+            ),
             font=dict(color=PLOT_FONT_COLOR),
             showlegend=True,
             legend=dict(
                 orientation="h",
                 y=1.08,
                 x=0.38,
-                font=dict(size=14, color=PLOT_FONT_COLOR)
+                font=dict(size=15, color=PLOT_FONT_COLOR)
             ),
             xaxis=dict(
-                title="Theme",
+                title=dict(
+                    text="Theme",
+                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                ),
                 tickangle=-25,
                 showgrid=False,
-                tickfont=dict(color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
-                title="Total Reviews",
+                title=dict(
+                    text="Total Reviews",
+                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                ),
                 type="linear",
                 showgrid=False,
                 zeroline=False,
-                tickfont=dict(color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
             ),
             yaxis2=dict(
-                title="Avg Rating",
+                title=dict(
+                    text="Avg Rating",
+                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                ),
                 overlaying="y",
                 side="right",
                 range=[0, 5.3],
                 showgrid=False,
                 zeroline=False,
-                tickfont=dict(color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
-            margin=dict(t=105, b=115, l=70, r=70)
+            margin=dict(t=105, b=125, l=80, r=80)
         )
 
         st.plotly_chart(fig_theme, use_container_width=True)
 
         st.markdown("---")
 
+        # =========================
+        # Sentiment & Language
+        # =========================
         colA, colB = st.columns(2)
 
         with colA:
@@ -299,14 +320,26 @@ if uploaded_file:
                 template=PLOT_TEMPLATE,
                 height=480,
                 bargap=0.3,
+                title=dict(
+                    text="Sentiment Distribution",
+                    font=dict(size=22, color=PLOT_FONT_COLOR)
+                ),
                 font=dict(color=PLOT_FONT_COLOR),
                 xaxis=dict(
+                    title=dict(
+                        text="Sentiment",
+                        font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                    ),
                     showgrid=False,
-                    tickfont=dict(color=PLOT_FONT_COLOR)
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
                 ),
                 yaxis=dict(
+                    title=dict(
+                        text="Count",
+                        font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                    ),
                     showgrid=False,
-                    tickfont=dict(color=PLOT_FONT_COLOR)
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
                 ),
                 plot_bgcolor=PLOT_BG_COLOR,
                 paper_bgcolor=PLOT_BG_COLOR
@@ -330,14 +363,18 @@ if uploaded_file:
 
             fig_lang.update_traces(
                 textinfo="percent+label",
-                textfont=dict(size=14, color=PLOT_FONT_COLOR)
+                textfont=dict(size=15, color=PLOT_FONT_COLOR)
             )
 
             fig_lang.update_layout(
                 template=PLOT_TEMPLATE,
                 height=480,
+                title=dict(
+                    text="Language Distribution",
+                    font=dict(size=22, color=PLOT_FONT_COLOR)
+                ),
                 font=dict(color=PLOT_FONT_COLOR),
-                legend=dict(font=dict(color=PLOT_FONT_COLOR)),
+                legend=dict(font=dict(size=15, color=PLOT_FONT_COLOR)),
                 plot_bgcolor=PLOT_BG_COLOR,
                 paper_bgcolor=PLOT_BG_COLOR,
                 showlegend=True
@@ -347,6 +384,9 @@ if uploaded_file:
 
         st.markdown("---")
 
+        # =========================
+        # Negative Reviews by Theme
+        # =========================
         st.subheader("🔥 Negative Reviews by Theme")
 
         neg_df = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
@@ -375,7 +415,7 @@ if uploaded_file:
             marker=dict(color=colors),
             text=neg_theme["Label"],
             textposition="outside",
-            textfont=dict(color=PLOT_FONT_COLOR),
+            textfont=dict(size=14, color=PLOT_FONT_COLOR),
             cliponaxis=False,
             hovertemplate="<b>%{y}</b><br>Negative Reviews: %{x:,}<extra></extra>"
         ))
@@ -384,23 +424,33 @@ if uploaded_file:
 
         fig_neg.update_layout(
             template=PLOT_TEMPLATE,
-            height=520,
+            height=530,
+            title=dict(
+                text="Negative Reviews by Theme",
+                font=dict(size=22, color=PLOT_FONT_COLOR)
+            ),
             font=dict(color=PLOT_FONT_COLOR),
             xaxis=dict(
-                title="Negative Reviews",
+                title=dict(
+                    text="Negative Reviews",
+                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                ),
                 showgrid=False,
                 range=[0, max_neg * 1.18],
-                tickfont=dict(color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
-                title="Theme",
+                title=dict(
+                    text="Theme",
+                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                ),
                 categoryorder="total ascending",
                 showgrid=False,
-                tickfont=dict(color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
-            margin=dict(l=90, r=150, t=40, b=40),
+            margin=dict(l=100, r=160, t=70, b=50),
             showlegend=False
         )
 
@@ -408,6 +458,9 @@ if uploaded_file:
 
         st.markdown("---")
 
+        # =========================
+        # Top Subthemes
+        # =========================
         st.subheader("🧩 Top Subthemes")
 
         sub_data = analysis_df[subtheme_col].value_counts().head(20).reset_index()
@@ -425,7 +478,7 @@ if uploaded_file:
 
         fig_sub.update_traces(
             textposition="outside",
-            textfont=dict(color=PLOT_FONT_COLOR),
+            textfont=dict(size=14, color=PLOT_FONT_COLOR),
             cliponaxis=False
         )
 
@@ -433,21 +486,33 @@ if uploaded_file:
 
         fig_sub.update_layout(
             template=PLOT_TEMPLATE,
-            height=650,
+            height=670,
+            title=dict(
+                text="Top Subthemes",
+                font=dict(size=22, color=PLOT_FONT_COLOR)
+            ),
             font=dict(color=PLOT_FONT_COLOR),
             xaxis=dict(
+                title=dict(
+                    text="Count",
+                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                ),
                 showgrid=False,
                 range=[0, max_sub * 1.18],
-                tickfont=dict(color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
+                title=dict(
+                    text="Subtheme",
+                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                ),
                 showgrid=False,
                 categoryorder="total ascending",
-                tickfont=dict(color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
-            margin=dict(r=160)
+            margin=dict(l=100, r=170, t=70, b=50)
         )
 
         st.plotly_chart(fig_sub, use_container_width=True)
