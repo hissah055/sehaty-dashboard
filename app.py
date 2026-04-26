@@ -29,7 +29,7 @@ def get_logo_html():
         logo_base64 = base64.b64encode(logo_path.read_bytes()).decode()
         return (
             f'<img src="data:image/png;base64,{logo_base64}" '
-            f'style="width:170px; height:110px; object-fit:contain; margin-right:30px;"
+            f'style="width:170px; height:110px; object-fit:contain; margin-right:30px;">'
         )
 
     return '<div style="font-size:60px; margin-right:20px;">📊</div>'
@@ -177,9 +177,6 @@ if uploaded_file:
 
         st.success("✅ Analysis Completed!")
 
-        # =========================
-        # Metrics
-        # =========================
         c1, c2, c3, c4, c5 = st.columns(5)
 
         c1.metric("Total Reviews", f"{total_reviews:,}")
@@ -190,9 +187,6 @@ if uploaded_file:
 
         st.markdown("---")
 
-        # =========================
-        # Reviews & Avg Rating by Theme
-        # =========================
         st.subheader("📊 Reviews & Avg Rating by Theme")
 
         theme_summary = analysis_df.groupby(theme_col).agg(
@@ -274,9 +268,6 @@ if uploaded_file:
 
         st.markdown("---")
 
-        # =========================
-        # Sentiment & Language
-        # =========================
         colA, colB = st.columns(2)
 
         with colA:
@@ -356,9 +347,6 @@ if uploaded_file:
 
         st.markdown("---")
 
-        # =========================
-        # Negative Reviews by Theme
-        # =========================
         st.subheader("🔥 Negative Reviews by Theme")
 
         neg_df = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
@@ -420,9 +408,6 @@ if uploaded_file:
 
         st.markdown("---")
 
-        # =========================
-        # Top Subthemes
-        # =========================
         st.subheader("🧩 Top Subthemes")
 
         sub_data = analysis_df[subtheme_col].value_counts().head(20).reset_index()
