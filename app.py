@@ -179,7 +179,6 @@ if uploaded_file:
                 tickangle=-25,
                 showgrid=False,
                 tickfont=dict(color=PLOT_FONT_COLOR),
-                titlefont=dict(color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
                 title="Total Reviews",
@@ -187,7 +186,6 @@ if uploaded_file:
                 showgrid=False,
                 zeroline=False,
                 tickfont=dict(color=PLOT_FONT_COLOR),
-                titlefont=dict(color=PLOT_FONT_COLOR)
             ),
             yaxis2=dict(
                 title="Avg Rating",
@@ -197,7 +195,6 @@ if uploaded_file:
                 showgrid=False,
                 zeroline=False,
                 tickfont=dict(color=PLOT_FONT_COLOR),
-                titlefont=dict(color=PLOT_FONT_COLOR)
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
@@ -251,7 +248,6 @@ if uploaded_file:
                 yaxis=dict(
                     showgrid=False,
                     tickfont=dict(color=PLOT_FONT_COLOR),
-                    titlefont=dict(color=PLOT_FONT_COLOR)
                 ),
                 plot_bgcolor=PLOT_BG_COLOR,
                 paper_bgcolor=PLOT_BG_COLOR
@@ -339,14 +335,12 @@ if uploaded_file:
                 showgrid=False,
                 range=[0, max_neg * 1.18],
                 tickfont=dict(color=PLOT_FONT_COLOR),
-                titlefont=dict(color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
                 title="Theme",
                 categoryorder="total ascending",
                 showgrid=False,
                 tickfont=dict(color=PLOT_FONT_COLOR),
-                titlefont=dict(color=PLOT_FONT_COLOR)
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
@@ -392,13 +386,11 @@ if uploaded_file:
                 showgrid=False,
                 range=[0, max_sub * 1.18],
                 tickfont=dict(color=PLOT_FONT_COLOR),
-                titlefont=dict(color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
                 showgrid=False,
                 categoryorder="total ascending",
                 tickfont=dict(color=PLOT_FONT_COLOR),
-                titlefont=dict(color=PLOT_FONT_COLOR)
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
