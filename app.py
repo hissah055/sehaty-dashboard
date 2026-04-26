@@ -21,14 +21,6 @@ PLOT_AXIS_TITLE_SIZE = 20
 PLOT_TICK_SIZE = 15
 PLOT_TITLE_SIZE = 24
 
-# =========================
-# Privacy Columns
-# =========================
-COLUMNS_TO_REMOVE = [
-    "UserName", "Username", "userName", "User Name",
-    "Name", "Reviewer", "Author", "👤 UserName"
-]
-
 
 # =========================
 # Logo Function
@@ -103,10 +95,26 @@ def clean_category(value):
 
 
 def remove_private_columns(dataframe):
-    return dataframe.drop(
-        columns=[col for col in COLUMNS_TO_REMOVE if col in dataframe.columns],
-        errors="ignore"
-    )
+    private_cols = []
+
+    for col in dataframe.columns:
+        col_text = str(col).strip().lower()
+        col_clean = (
+            col_text
+            .replace(" ", "")
+            .replace("_", "")
+            .replace("-", "")
+        )
+
+        if (
+            "username" in col_clean
+            or col_clean in ["name", "reviewer", "author"]
+            or "reviewer" in col_clean
+            or "author" in col_clean
+        ):
+            private_cols.append(col)
+
+    return dataframe.drop(columns=private_cols, errors="ignore")
 
 
 if uploaded_file:
