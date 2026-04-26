@@ -495,40 +495,9 @@ def get_sorted_unique(series):
     return values
 
 
-# =========================
-# Clear Filters Function
-# =========================
 def clear_dashboard_filters():
-    filter_keys = [
-        "filter_years",
-        "filter_quarters",
-        "filter_months",
-        "filter_ratings",
-        "filter_languages",
-        "filter_sentiments",
-        "filter_themes",
-        "filter_subthemes",
-        "review_search_keyword",
-    ]
-
-    for key in filter_keys:
-        if key == "review_search_keyword":
-            st.session_state[key] = ""
-        else:
-            st.session_state[key] = []
-
     st.session_state["analysis_ready"] = False
-    st.session_state["last_filter_state"] = (
-        tuple(),
-        tuple(),
-        tuple(),
-        tuple(),
-        tuple(),
-        tuple(),
-        tuple(),
-        tuple(),
-        "",
-    )
+    st.rerun()
 
 
 # =========================
@@ -735,8 +704,8 @@ if uploaded_file:
             "Review Year",
             options=year_options,
             default=[],
-            placeholder="All years",
-            key="filter_years"
+            placeholder="All years"
+           
         )
 
     with f2:
@@ -744,8 +713,8 @@ if uploaded_file:
             "Quarter",
             options=quarter_options,
             default=[],
-            placeholder="All quarters",
-            key="filter_quarters"
+            placeholder="All quarters"
+            
         )
 
     with f3:
@@ -753,8 +722,8 @@ if uploaded_file:
             "Month",
             options=month_options,
             default=[],
-            placeholder="All months",
-            key="filter_months"
+            placeholder="All months"
+            
         )
 
     with f4:
@@ -762,8 +731,8 @@ if uploaded_file:
             "Rating",
             options=rating_options,
             default=[],
-            placeholder="All ratings",
-            key="filter_ratings"
+            placeholder="All ratings"
+           
         )
 
     f5, f6, f7, f8 = st.columns([1.2, 1.2, 1.6, 1.6])
@@ -773,8 +742,8 @@ if uploaded_file:
             "Language",
             options=language_options,
             default=[],
-            placeholder="All languages",
-            key="filter_languages"
+            placeholder="All languages"
+            
         )
 
     with f6:
@@ -782,8 +751,8 @@ if uploaded_file:
             "Sentiment",
             options=sentiment_options,
             default=[],
-            placeholder="All sentiments",
-            key="filter_sentiments"
+            placeholder="All sentiments"
+          
         )
 
     with f7:
@@ -791,8 +760,8 @@ if uploaded_file:
             "Theme",
             options=theme_options,
             default=[],
-            placeholder="All themes",
-            key="filter_themes"
+            placeholder="All themes"
+           
         )
 
     with f8:
@@ -800,8 +769,8 @@ if uploaded_file:
             "Subtheme",
             options=subtheme_options,
             default=[],
-            placeholder="All subthemes",
-            key="filter_subthemes"
+            placeholder="All subthemes"
+           
         )
 
     clear_col, info_col = st.columns([1, 5])
