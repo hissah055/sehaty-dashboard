@@ -13,53 +13,170 @@ st.set_page_config(
 )
 
 # =========================
-# App Global Style - Works in Light & Dark Mode
+# App Global Style - Better Visibility in Light & Dark Mode
 # =========================
 st.markdown(
     """
     <style>
+    :root {
+        --accent-main: #0891B2;
+        --accent-dark: #0F766E;
+        --label-color: #22D3EE;
+        --helper-color: #AFC0D4;
+        --text-dark: #111827;
+        --placeholder-color: #64748B;
+        --box-border: #CBD5E1;
+        --hover-bg: #E0F2FE;
+        --selected-bg: #CCFBF1;
+    }
+
     /* Green progress bar */
     .stProgress > div > div > div > div {
         background-color: #22C55E !important;
     }
 
-    /* General labels - teal and clear in light/dark */
+    /* Main labels */
     label p,
     [data-testid="stWidgetLabel"] p,
     [data-testid="stWidgetLabel"] span {
         font-weight: 800 !important;
-        color: #14B8D4 !important;
+        color: var(--label-color) !important;
     }
 
-    /* Sidebar labels */
+    /* Sidebar labels + sidebar header */
     section[data-testid="stSidebar"] label p,
     section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
-    section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] span {
-        color: #14B8D4 !important;
+    section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] span,
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {
+        color: var(--label-color) !important;
         font-weight: 800 !important;
+    }
+
+    /* File uploader label */
+    [data-testid="stFileUploader"] label,
+    [data-testid="stFileUploader"] label p,
+    [data-testid="stFileUploader"] span {
+        color: var(--label-color) !important;
+        font-weight: 800 !important;
+    }
+
+    /* Captions / helper text */
+    .stCaption,
+    [data-testid="stCaptionContainer"],
+    [data-testid="stCaptionContainer"] p {
+        color: var(--helper-color) !important;
+        font-weight: 650 !important;
     }
 
     /* Sidebar select boxes */
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div {
         background: #FFFFFF !important;
-        border: 1px solid #CBD5E1 !important;
+        border: 1px solid var(--box-border) !important;
         border-radius: 16px !important;
-        color: #111827 !important;
+        color: var(--text-dark) !important;
         box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10) !important;
     }
 
     section[data-testid="stSidebar"] div[data-baseweb="select"] * {
-        color: #111827 !important;
+        color: var(--text-dark) !important;
     }
 
     section[data-testid="stSidebar"] div[data-baseweb="select"] svg {
-        fill: #0F766E !important;
-        color: #0F766E !important;
+        fill: var(--accent-dark) !important;
+        color: var(--accent-dark) !important;
     }
 
-    /* Run Analysis button */
+    /* Main filter boxes */
+    div[data-baseweb="select"] > div {
+        background: #FFFFFF !important;
+        border: 1px solid var(--box-border) !important;
+        border-radius: 16px !important;
+        color: var(--text-dark) !important;
+        min-height: 52px !important;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10) !important;
+    }
+
+    div[data-baseweb="select"] * {
+        color: var(--text-dark) !important;
+    }
+
+    div[data-baseweb="select"] svg {
+        fill: var(--accent-dark) !important;
+        color: var(--accent-dark) !important;
+        filter: drop-shadow(0 0 3px rgba(15,118,110,0.25));
+    }
+
+    /* Selected tags inside multiselect */
+    div[data-baseweb="tag"] {
+        background: linear-gradient(135deg, var(--accent-main), var(--accent-dark)) !important;
+        border: 1px solid rgba(15,118,110,0.25) !important;
+        border-radius: 10px !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(15,118,110,0.20) !important;
+    }
+
+    div[data-baseweb="tag"] span {
+        color: white !important;
+        font-weight: 800 !important;
+    }
+
+    div[data-baseweb="tag"] svg {
+        fill: white !important;
+        color: white !important;
+    }
+
+    /* Dropdown popover background */
+    div[data-baseweb="popover"] {
+        background: #FFFFFF !important;
+        color: var(--text-dark) !important;
+    }
+
+    div[data-baseweb="popover"] * {
+        color: var(--text-dark) !important;
+    }
+
+    /* Dropdown menu itself */
+    div[role="listbox"] {
+        background: #FFFFFF !important;
+        color: var(--text-dark) !important;
+        border-radius: 12px !important;
+    }
+
+    /* Dropdown options */
+    div[role="option"] {
+        background: #FFFFFF !important;
+        color: var(--text-dark) !important;
+    }
+
+    div[role="option"]:hover {
+        background: var(--hover-bg) !important;
+        color: var(--text-dark) !important;
+    }
+
+    div[aria-selected="true"] {
+        background: var(--selected-bg) !important;
+        color: var(--text-dark) !important;
+    }
+
+    /* Search input inside dropdown */
+    div[data-baseweb="popover"] input {
+        background: #F8FAFC !important;
+        color: var(--text-dark) !important;
+        border: 1px solid var(--box-border) !important;
+        border-radius: 10px !important;
+        caret-color: var(--text-dark) !important;
+    }
+
+    div[data-baseweb="popover"] input::placeholder {
+        color: var(--placeholder-color) !important;
+        opacity: 1 !important;
+    }
+
+    /* Buttons */
     div.stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #0891B2, #0F766E) !important;
+        background: linear-gradient(135deg, var(--accent-main), var(--accent-dark)) !important;
         color: white !important;
         border: none !important;
         border-radius: 12px !important;
@@ -72,24 +189,9 @@ st.markdown(
         transform: translateY(-1px);
     }
 
-    /* Normal buttons */
     div.stButton > button {
         border-radius: 12px !important;
         font-weight: 700 !important;
-    }
-
-    /* Captions - readable in dark and light */
-    .stCaption, [data-testid="stCaptionContainer"] {
-        color: #94A3B8 !important;
-        font-weight: 600 !important;
-    }
-
-    /* File uploader label */
-    [data-testid="stFileUploader"] label,
-    [data-testid="stFileUploader"] label p,
-    [data-testid="stFileUploader"] span {
-        color: #14B8D4 !important;
-        font-weight: 800 !important;
     }
     </style>
     """,
@@ -345,7 +447,7 @@ if uploaded_file:
     filter_df["Sentiment_Clean"] = filter_df[sentiment_col].apply(clean_sentiment)
 
     # =========================
-    # Dashboard Filter Style
+    # Dashboard Filter Title
     # =========================
     filter_style_html = """
 <style>
@@ -359,70 +461,6 @@ if uploaded_file:
     margin-top: 10px;
     margin-bottom: 16px;
     box-shadow: 0 8px 22px rgba(15, 118, 110, 0.25);
-}
-
-/* Filter labels - teal in light/dark */
-label p,
-[data-testid="stWidgetLabel"] p,
-[data-testid="stWidgetLabel"] span {
-    font-weight: 800 !important;
-    color: #14B8D4 !important;
-}
-
-/* Main filter boxes */
-div[data-baseweb="select"] > div {
-    background: #FFFFFF !important;
-    border: 1px solid #CBD5E1 !important;
-    border-radius: 16px !important;
-    color: #111827 !important;
-    min-height: 52px !important;
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10) !important;
-}
-
-/* Text inside filters */
-div[data-baseweb="select"] * {
-    color: #111827 !important;
-}
-
-/* Dropdown arrow */
-div[data-baseweb="select"] svg {
-    fill: #0F766E !important;
-    color: #0F766E !important;
-    filter: drop-shadow(0 0 3px rgba(15,118,110,0.25));
-}
-
-/* Selected tags inside multiselect */
-div[data-baseweb="tag"] {
-    background: linear-gradient(135deg, #0891B2, #0F766E) !important;
-    border: 1px solid rgba(15,118,110,0.25) !important;
-    border-radius: 10px !important;
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(15,118,110,0.20) !important;
-}
-
-div[data-baseweb="tag"] span {
-    color: white !important;
-    font-weight: 800 !important;
-}
-
-div[data-baseweb="tag"] svg {
-    fill: white !important;
-    color: white !important;
-}
-
-/* Dropdown menu */
-div[data-baseweb="popover"] {
-    color: #111827 !important;
-}
-
-div[data-baseweb="popover"] * {
-    color: #111827 !important;
-}
-
-/* Captions */
-.stCaption, [data-testid="stCaptionContainer"] {
-    color: #94A3B8 !important;
-    font-weight: 600 !important;
 }
 </style>
 <div class="filter-title">🔎 Dashboard Filters</div>
