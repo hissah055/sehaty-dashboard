@@ -158,13 +158,18 @@ if uploaded_file:
         index=list(df.columns).index("Rating") if "Rating" in df.columns else 0
     )
 
+    # =========================
+    # Data Preview
+    # =========================
     st.subheader("🔍 Data Preview")
     st.caption("Showing a preview with usernames removed for privacy.")
 
-    preview_df = df.head().copy()
+    preview_df = df.head(5).copy()
     preview_df = remove_private_columns(preview_df)
+    preview_df.insert(0, "Review_ID", range(1, len(preview_df) + 1))
+    preview_df = preview_df.reset_index(drop=True)
 
-    st.dataframe(preview_df, width="stretch")
+    st.dataframe(preview_df, width="stretch", hide_index=True)
 
     if st.button("🚀 Start Analysis"):
 
@@ -556,5 +561,6 @@ if uploaded_file:
         sample_df = analysis_df.head(20).copy()
         sample_df.insert(0, "Review_ID", range(1, len(sample_df) + 1))
         sample_df = remove_private_columns(sample_df)
+        sample_df = sample_df.reset_index(drop=True)
 
-        st.dataframe(sample_df, width="stretch")
+        st.dataframe(sample_df, width="stretch", hide_index=True)
