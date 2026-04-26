@@ -1,4 +1,6 @@
-import time
+import base64
+from pathlib import Path
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -16,11 +18,30 @@ PLOT_TEMPLATE = "plotly_white"
 PLOT_FONT_COLOR = "#1F2937"
 PLOT_BG_COLOR = "#FFFFFF"
 
+
+# =========================
+# Logo Function
+# =========================
+def get_logo_html():
+    logo_path = Path("sehhaty_logo.png")
+
+    if logo_path.exists():
+        logo_base64 = base64.b64encode(logo_path.read_bytes()).decode()
+        return f"""
+        <img src="data:image/png;base64,{logo_base64}"
+             style="width:78px; height:78px; object-fit:contain; margin-right:20px;">
+        """
+    else:
+        return """
+        <div style="font-size:60px; margin-right:20px;">📊</div>
+        """
+
+
 # =========================
 # Header Design
 # =========================
 st.markdown(
-    """
+    f"""
     <div style="
         padding: 28px 30px;
         border-radius: 22px;
@@ -28,19 +49,32 @@ st.markdown(
         color: white;
         margin-bottom: 25px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+        display: flex;
+        align-items: center;
     ">
-        <h1 style="margin-bottom: 8px; font-size: 42px;">
-            📊 Sehhaty Smart Feedback Intelligence Platform
-        </h1>
-        <p style="font-size: 19px; margin: 0;">
-            An interactive dashboard for analyzing Sehhaty app reviews by sentiment, themes, subthemes, language, and rating.
-        </p>
+        {get_logo_html()}
+        <div>
+            <h1 style="margin-bottom: 8px; font-size: 42px;">
+                Sehhaty Smart Feedback Intelligence Platform
+            </h1>
+            <p style="font-size: 19px; margin: 0;">
+                An interactive dashboard for analyzing Sehhaty app reviews by sentiment, themes, subthemes, language, and rating.
+            </p>
+        </div>
     </div>
     """,
     unsafe_allow_html=True
 )
 
 uploaded_file = st.file_uploader("📂 Upload Excel file", type=["xlsx"])
+
+
+# =========================
+# Cache Excel Loading
+# =========================
+@st.cache_data(show_spinner=False)
+def load_excel(file):
+    return pd.read_excel(file)
 
 
 # =========================
@@ -71,19 +105,8 @@ def clean_category(value):
     return value
 
 
-def clean_plot_layout(fig, height=None):
-    fig.update_layout(
-        template=PLOT_TEMPLATE,
-        font=dict(color=PLOT_FONT_COLOR),
-        plot_bgcolor=PLOT_BG_COLOR,
-        paper_bgcolor=PLOT_BG_COLOR,
-        height=height
-    )
-    return fig
-
-
 if uploaded_file:
-    df = pd.read_excel(uploaded_file)
+    df = load_excel(uploaded_file)
 
     st.sidebar.header("⚙️ Column Settings")
 
@@ -133,7 +156,6 @@ if uploaded_file:
 
         status_text.write("⏳ Preparing data...")
         progress_bar.progress(15)
-        time.sleep(0.4)
 
         df[text_col] = df[text_col].fillna("").astype(str)
         df[theme_col] = df[theme_col].apply(clean_category)
@@ -143,7 +165,6 @@ if uploaded_file:
 
         status_text.write("🧹 Cleaning sentiment, themes, and subthemes...")
         progress_bar.progress(35)
-        time.sleep(0.4)
 
         df["Sentiment_Clean"] = df[sentiment_col].apply(clean_sentiment)
 
@@ -155,7 +176,6 @@ if uploaded_file:
 
         status_text.write("📊 Calculating key indicators...")
         progress_bar.progress(55)
-        time.sleep(0.4)
 
         total_reviews = len(df)
         avg_rating = analysis_df[rating_col].mean()
@@ -164,12 +184,10 @@ if uploaded_file:
         neutral_count = (analysis_df["Sentiment_Clean"] == "Neutral").sum()
 
         status_text.write("🎨 Building interactive charts...")
-        progress_bar.progress(75)
-        time.sleep(0.4)
+        progress_bar.progress(80)
 
         progress_bar.progress(100)
         status_text.write("✅ Analysis completed successfully!")
-        time.sleep(0.3)
 
         st.success("✅ Analysis Completed!")
 
@@ -466,4 +484,5 @@ if uploaded_file:
         st.markdown("---")
 
         st.subheader("📄 Data Sample")
-        st.dataframe(analysis_df.head(100), use_container_width=True)
+        st.caption("Showing a sample of 20 rows only for faster performance.")
+        st.dataframe(analysis_df.head(20), use_container_width=True)
