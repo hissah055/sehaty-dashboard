@@ -95,23 +95,141 @@ st.markdown(
         filter: drop-shadow(0 0 3px rgba(15,118,110,0.25));
     }
 
-    /* Selected tags inside multiselect */
-    div[data-baseweb="tag"] {
-        background: linear-gradient(135deg, var(--accent-main), var(--accent-dark)) !important;
-        border: 1px solid rgba(15,118,110,0.25) !important;
-        border-radius: 10px !important;
-        color: white !important;
-        box-shadow: 0 4px 12px rgba(15,118,110,0.20) !important;
+    /* ========================= */
+    /* Force selected multiselect tags to teal, not red */
+    /* ========================= */
+
+    div[data-baseweb="tag"],
+    span[data-baseweb="tag"],
+    [data-baseweb="tag"],
+    div[data-testid="stMultiSelect"] [data-baseweb="tag"],
+    div[data-testid="stMultiSelect"] span[data-baseweb="tag"],
+    .stMultiSelect [data-baseweb="tag"] {
+        position: relative !important;
+        overflow: hidden !important;
+        background: linear-gradient(135deg, #0891B2 0%, #0F766E 100%) !important;
+        background-color: #0F766E !important;
+        border: 1px solid rgba(255,255,255,0.35) !important;
+        border-radius: 13px !important;
+        color: #FFFFFF !important;
+        box-shadow:
+            0 6px 14px rgba(15,118,110,0.28),
+            inset 0 0 10px rgba(255,255,255,0.10) !important;
+        padding: 5px 9px !important;
+        transform: translateY(0);
+        transition: all 0.25s ease !important;
     }
 
-    div[data-baseweb="tag"] span {
-        color: white !important;
+    /* Force all inner parts of selected tags */
+    div[data-baseweb="tag"] *,
+    span[data-baseweb="tag"] *,
+    [data-baseweb="tag"] *,
+    div[data-testid="stMultiSelect"] [data-baseweb="tag"] *,
+    .stMultiSelect [data-baseweb="tag"] * {
+        background-color: transparent !important;
+        color: #FFFFFF !important;
+        fill: #FFFFFF !important;
+    }
+
+    /* Text inside selected tag */
+    div[data-baseweb="tag"] span,
+    span[data-baseweb="tag"] span,
+    [data-baseweb="tag"] span {
+        color: #FFFFFF !important;
         font-weight: 800 !important;
+        position: relative !important;
+        z-index: 2 !important;
     }
 
-    div[data-baseweb="tag"] svg {
-        fill: white !important;
-        color: white !important;
+    /* X icon inside selected tag */
+    div[data-baseweb="tag"] svg,
+    span[data-baseweb="tag"] svg,
+    [data-baseweb="tag"] svg {
+        fill: #FFFFFF !important;
+        color: #FFFFFF !important;
+        opacity: 0.95 !important;
+        position: relative !important;
+        z-index: 3 !important;
+    }
+
+    /* X button circle */
+    div[data-baseweb="tag"] button,
+    span[data-baseweb="tag"] button,
+    [data-baseweb="tag"] button {
+        background: rgba(255,255,255,0.18) !important;
+        border-radius: 50% !important;
+        margin-left: 6px !important;
+        transition: all 0.2s ease !important;
+        position: relative !important;
+        z-index: 3 !important;
+    }
+
+    div[data-baseweb="tag"] button:hover,
+    span[data-baseweb="tag"] button:hover,
+    [data-baseweb="tag"] button:hover {
+        background: rgba(255,255,255,0.32) !important;
+        transform: scale(1.05);
+    }
+
+    /* Soft shine on selected tags */
+    div[data-baseweb="tag"]::before,
+    span[data-baseweb="tag"]::before,
+    [data-baseweb="tag"]::before {
+        content: "";
+        position: absolute;
+        top: -60%;
+        left: -85%;
+        width: 55%;
+        height: 220%;
+        background: linear-gradient(
+            120deg,
+            rgba(255,255,255,0.00) 0%,
+            rgba(255,255,255,0.18) 40%,
+            rgba(255,255,255,0.55) 50%,
+            rgba(255,255,255,0.14) 60%,
+            rgba(255,255,255,0.00) 100%
+        );
+        transform: rotate(20deg);
+        animation: selectedTagShine 3.8s infinite ease-in-out;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    @keyframes selectedTagShine {
+        0% {
+            left: -85%;
+            opacity: 0.15;
+        }
+        45% {
+            left: 120%;
+            opacity: 0.85;
+        }
+        100% {
+            left: 120%;
+            opacity: 0;
+        }
+    }
+
+    /* Hover effect */
+    div[data-baseweb="tag"]:hover,
+    span[data-baseweb="tag"]:hover,
+    [data-baseweb="tag"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow:
+            0 9px 18px rgba(15,118,110,0.35),
+            inset 0 0 12px rgba(255,255,255,0.18) !important;
+        filter: brightness(1.05);
+    }
+
+    /* Extra override for Streamlit red selected tags */
+    .stMultiSelect [data-baseweb="tag"],
+    .stMultiSelect [data-baseweb="tag"] *,
+    [data-testid="stMultiSelect"] [data-baseweb="tag"],
+    [data-testid="stMultiSelect"] [data-baseweb="tag"] * {
+        background: linear-gradient(135deg, #0891B2 0%, #0F766E 100%) !important;
+        background-color: #0F766E !important;
+        color: #FFFFFF !important;
+        fill: #FFFFFF !important;
     }
 
     /* Force dropdown menu white in dark mode */
