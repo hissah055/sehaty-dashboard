@@ -16,7 +16,7 @@ st.set_page_config(
 # =========================
 PLOT_TEMPLATE = "plotly_white"
 PLOT_FONT_COLOR = "#000000"
-PLOT_BG_COLOR = "#FFFFFF"
+PLOT_BG_COLOR = "#F0FDF4"   # Soft green background for charts
 PLOT_AXIS_TITLE_SIZE = 20
 PLOT_TICK_SIZE = 15
 PLOT_TITLE_SIZE = 24
@@ -286,7 +286,8 @@ if uploaded_file:
                 ),
                 tickangle=-25,
                 showgrid=False,
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR),
+                linecolor="#BBF7D0"
             ),
             yaxis=dict(
                 title=dict(
@@ -296,7 +297,8 @@ if uploaded_file:
                 type="linear",
                 showgrid=False,
                 zeroline=False,
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR),
+                linecolor="#BBF7D0"
             ),
             yaxis2=dict(
                 title=dict(
@@ -308,7 +310,8 @@ if uploaded_file:
                 range=[0, 5.3],
                 showgrid=False,
                 zeroline=False,
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR),
+                linecolor="#BBF7D0"
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
@@ -364,7 +367,8 @@ if uploaded_file:
                         font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
                     ),
                     showgrid=False,
-                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR),
+                    linecolor="#BBF7D0"
                 ),
                 yaxis=dict(
                     title=dict(
@@ -372,7 +376,8 @@ if uploaded_file:
                         font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
                     ),
                     showgrid=False,
-                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR),
+                    linecolor="#BBF7D0"
                 ),
                 plot_bgcolor=PLOT_BG_COLOR,
                 paper_bgcolor=PLOT_BG_COLOR
@@ -470,7 +475,8 @@ if uploaded_file:
                 ),
                 showgrid=False,
                 range=[0, max_neg * 1.18],
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR),
+                linecolor="#BBF7D0"
             ),
             yaxis=dict(
                 title=dict(
@@ -479,7 +485,8 @@ if uploaded_file:
                 ),
                 categoryorder="total ascending",
                 showgrid=False,
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR),
+                linecolor="#BBF7D0"
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
@@ -532,7 +539,8 @@ if uploaded_file:
                 ),
                 showgrid=False,
                 range=[0, max_sub * 1.18],
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR),
+                linecolor="#BBF7D0"
             ),
             yaxis=dict(
                 title=dict(
@@ -541,7 +549,8 @@ if uploaded_file:
                 ),
                 showgrid=False,
                 categoryorder="total ascending",
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR),
+                linecolor="#BBF7D0"
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
