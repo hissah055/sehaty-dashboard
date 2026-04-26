@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-
+PLOT_TEMPLATE = "plotly_dark"
 st.set_page_config(page_title="Smart Feedback Intelligence", layout="wide")
 
 st.title("📊 Smart Feedback Intelligence Platform")
