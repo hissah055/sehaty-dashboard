@@ -417,6 +417,166 @@ if uploaded_file:
         c4.metric("Negative", f"{negative_count:,}")
         c5.metric("Neutral", f"{neutral_count:,}")
 
+        # =========================
+        # Smart Insights Summary
+        # =========================
+        st.markdown("---")
+        st.subheader("✨ Smart Insights Summary")
+
+        top_year_text = "N/A"
+        best_year_text = "N/A"
+        top_theme_text = "N/A"
+        negative_theme_text = "N/A"
+        top_subtheme_text = "N/A"
+        negative_rate_text = "0%"
+
+        year_insight_df = analysis_df.dropna(subset=["Dashboard_Year"]).copy()
+        if not year_insight_df.empty:
+            year_counts = year_insight_df.groupby("Dashboard_Year").size()
+            top_year = int(year_counts.idxmax())
+            top_year_count = int(year_counts.max())
+            top_year_text = f"{top_year} ({top_year_count:,})"
+
+        year_rating_insight_df = analysis_df.dropna(subset=["Dashboard_Year", rating_col]).copy()
+        if not year_rating_insight_df.empty:
+            avg_by_year = year_rating_insight_df.groupby("Dashboard_Year")[rating_col].mean()
+            best_year = int(avg_by_year.idxmax())
+            best_year_rating = avg_by_year.max()
+            best_year_text = f"{best_year} ({best_year_rating:.2f})"
+
+        theme_counts = analysis_df[theme_col].value_counts()
+        if not theme_counts.empty:
+            top_theme_text = f"{theme_counts.index[0]} ({theme_counts.iloc[0]:,})"
+
+        negative_df = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
+        if not negative_df.empty:
+            negative_theme_counts = negative_df[theme_col].value_counts()
+            if not negative_theme_counts.empty:
+                negative_theme_text = f"{negative_theme_counts.index[0]} ({negative_theme_counts.iloc[0]:,})"
+
+        subtheme_counts = analysis_df[subtheme_col].value_counts()
+        if not subtheme_counts.empty:
+            top_subtheme_text = f"{subtheme_counts.index[0]} ({subtheme_counts.iloc[0]:,})"
+
+        if len(analysis_df) > 0:
+            negative_rate = (negative_count / len(analysis_df)) * 100
+            negative_rate_text = f"{negative_rate:.1f}%"
+
+        st.markdown(
+            """
+            <style>
+            .insight-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 18px;
+                margin-top: 18px;
+                margin-bottom: 18px;
+            }
+
+            .insight-card {
+                background: linear-gradient(135deg, #0F766E, #0C848F);
+                padding: 22px 24px;
+                border-radius: 20px;
+                color: white;
+                box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+                border: 1px solid rgba(255,255,255,0.22);
+                transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
+                animation: fadeInUp 0.6s ease both;
+                min-height: 145px;
+                overflow-wrap: anywhere;
+            }
+
+            .insight-card:hover {
+                transform: translateY(-7px) scale(1.015);
+                box-shadow: 0 16px 36px rgba(0,0,0,0.32);
+                border: 1px solid rgba(255,255,255,0.45);
+            }
+
+            .insight-icon {
+                font-size: 34px;
+                margin-bottom: 10px;
+                display: block;
+            }
+
+            .insight-title {
+                font-size: 15px;
+                font-weight: 700;
+                opacity: 0.9;
+                margin-bottom: 8px;
+            }
+
+            .insight-value {
+                font-size: 23px;
+                font-weight: 850;
+                line-height: 1.25;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(18px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @media (max-width: 900px) {
+                .insight-grid {
+                    grid-template-columns: repeat(1, 1fr);
+                }
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            f"""
+            <div class="insight-grid">
+
+                <div class="insight-card">
+                    <span class="insight-icon">📅</span>
+                    <div class="insight-title">Most Active Year</div>
+                    <div class="insight-value">{top_year_text}</div>
+                </div>
+
+                <div class="insight-card">
+                    <span class="insight-icon">⭐</span>
+                    <div class="insight-title">Best Avg Rating Year</div>
+                    <div class="insight-value">{best_year_text}</div>
+                </div>
+
+                <div class="insight-card">
+                    <span class="insight-icon">🏆</span>
+                    <div class="insight-title">Top Theme</div>
+                    <div class="insight-value">{top_theme_text}</div>
+                </div>
+
+                <div class="insight-card">
+                    <span class="insight-icon">🔥</span>
+                    <div class="insight-title">Most Negative Theme</div>
+                    <div class="insight-value">{negative_theme_text}</div>
+                </div>
+
+                <div class="insight-card">
+                    <span class="insight-icon">🧩</span>
+                    <div class="insight-title">Top Subtheme</div>
+                    <div class="insight-value">{top_subtheme_text}</div>
+                </div>
+
+                <div class="insight-card">
+                    <span class="insight-icon">📉</span>
+                    <div class="insight-title">Negative Reviews Rate</div>
+                    <div class="insight-value">{negative_rate_text}</div>
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
         st.markdown("---")
 
         # =========================
