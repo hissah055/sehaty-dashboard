@@ -1,4 +1,5 @@
 import base64
+import time
 from pathlib import Path
 
 import streamlit as st
@@ -9,6 +10,20 @@ import plotly.graph_objects as go
 st.set_page_config(
     page_title="Sehhaty Smart Feedback Dashboard",
     layout="wide"
+)
+
+# =========================
+# Green Progress Bar Style
+# =========================
+st.markdown(
+    """
+    <style>
+    .stProgress > div > div > div > div {
+        background-color: #22C55E !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
 )
 
 # =========================
@@ -194,6 +209,8 @@ def clear_dashboard_filters():
         "filter_sentiments",
         "filter_themes",
         "filter_subthemes",
+        "analysis_ready",
+        "last_filter_state",
     ]
 
     for key in filter_keys:
@@ -505,7 +522,58 @@ div[data-baseweb="tag"] svg {
             st.rerun()
 
     with info_col:
-        st.caption("No selection means All. Changing any filter updates all KPI cards, insights, charts, and data preview automatically.")
+        st.caption("No selection means All. Choose the filters, then click Run Analysis to display the dashboard.")
+
+    # =========================
+    # Run Analysis Control
+    # =========================
+    current_filter_state = (
+        tuple(selected_years),
+        tuple(selected_quarters),
+        tuple(selected_months),
+        tuple(selected_ratings),
+        tuple(selected_languages),
+        tuple(selected_sentiments),
+        tuple(selected_themes),
+        tuple(selected_subthemes),
+    )
+
+    if "last_filter_state" not in st.session_state:
+        st.session_state["last_filter_state"] = current_filter_state
+
+    if st.session_state["last_filter_state"] != current_filter_state:
+        st.session_state["analysis_ready"] = False
+        st.session_state["last_filter_state"] = current_filter_state
+
+    run_col, note_col = st.columns([1.2, 4.8])
+
+    with run_col:
+        run_analysis = st.button("🚀 Run Analysis", type="primary", use_container_width=True)
+
+    with note_col:
+        st.caption("The charts and results will appear after clicking Run Analysis.")
+
+    if run_analysis:
+        progress_bar = st.progress(0, text="Preparing data...")
+
+        progress_bar.progress(25, text="Applying selected filters...")
+        time.sleep(0.25)
+
+        progress_bar.progress(55, text="Calculating indicators...")
+        time.sleep(0.25)
+
+        progress_bar.progress(80, text="Building charts...")
+        time.sleep(0.25)
+
+        progress_bar.progress(100, text="Analysis completed!")
+        time.sleep(0.25)
+
+        st.session_state["analysis_ready"] = True
+        progress_bar.empty()
+
+    if not st.session_state.get("analysis_ready", False):
+        st.info("👆 Please choose the filters, then click **Run Analysis** to display the dashboard charts and results.")
+        st.stop()
 
     def apply_dashboard_filters(dataframe):
         result = dataframe.copy()
