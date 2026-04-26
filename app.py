@@ -21,6 +21,14 @@ PLOT_AXIS_TITLE_SIZE = 20
 PLOT_TICK_SIZE = 15
 PLOT_TITLE_SIZE = 24
 
+# =========================
+# Privacy Columns
+# =========================
+COLUMNS_TO_REMOVE = [
+    "UserName", "Username", "userName", "User Name",
+    "Name", "Reviewer", "Author", "👤 UserName"
+]
+
 
 # =========================
 # Logo Function
@@ -94,6 +102,13 @@ def clean_category(value):
     return value
 
 
+def remove_private_columns(dataframe):
+    return dataframe.drop(
+        columns=[col for col in COLUMNS_TO_REMOVE if col in dataframe.columns],
+        errors="ignore"
+    )
+
+
 if uploaded_file:
     df = load_excel(uploaded_file)
 
@@ -136,7 +151,12 @@ if uploaded_file:
     )
 
     st.subheader("🔍 Data Preview")
-    st.dataframe(df.head(), use_container_width=True)
+    st.caption("Showing a preview with usernames removed for privacy.")
+
+    preview_df = df.head().copy()
+    preview_df = remove_private_columns(preview_df)
+
+    st.dataframe(preview_df, width="stretch")
 
     if st.button("🚀 Start Analysis"):
 
@@ -282,7 +302,7 @@ if uploaded_file:
             margin=dict(t=105, b=125, l=80, r=80)
         )
 
-        st.plotly_chart(fig_theme, use_container_width=True)
+        st.plotly_chart(fig_theme, width="stretch")
 
         st.markdown("---")
 
@@ -345,7 +365,7 @@ if uploaded_file:
                 paper_bgcolor=PLOT_BG_COLOR
             )
 
-            st.plotly_chart(fig_sent, use_container_width=True)
+            st.plotly_chart(fig_sent, width="stretch")
 
         with colB:
             st.subheader("🌐 Language Distribution")
@@ -380,7 +400,7 @@ if uploaded_file:
                 showlegend=True
             )
 
-            st.plotly_chart(fig_lang, use_container_width=True)
+            st.plotly_chart(fig_lang, width="stretch")
 
         st.markdown("---")
 
@@ -454,7 +474,7 @@ if uploaded_file:
             showlegend=False
         )
 
-        st.plotly_chart(fig_neg, use_container_width=True)
+        st.plotly_chart(fig_neg, width="stretch")
 
         st.markdown("---")
 
@@ -515,7 +535,7 @@ if uploaded_file:
             margin=dict(l=100, r=170, t=70, b=50)
         )
 
-        st.plotly_chart(fig_sub, use_container_width=True)
+        st.plotly_chart(fig_sub, width="stretch")
 
         st.markdown("---")
 
@@ -527,15 +547,6 @@ if uploaded_file:
 
         sample_df = analysis_df.head(20).copy()
         sample_df.insert(0, "Review_ID", range(1, len(sample_df) + 1))
-
-        columns_to_remove = [
-            "UserName", "Username", "userName", "User Name",
-            "Name", "Reviewer", "Author"
-        ]
-
-        sample_df = sample_df.drop(
-            columns=[col for col in columns_to_remove if col in sample_df.columns],
-            errors="ignore"
-        )
+        sample_df = remove_private_columns(sample_df)
 
         st.dataframe(sample_df, width="stretch")
