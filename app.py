@@ -436,10 +436,11 @@ if uploaded_file:
 
                 year_summary["Dashboard_Year"] = year_summary["Dashboard_Year"].astype(int)
                 year_summary = year_summary.sort_values("Dashboard_Year")
+                year_summary["Year_Label"] = year_summary["Dashboard_Year"].astype(str)
 
                 fig_year = px.bar(
                     year_summary,
-                    x="Dashboard_Year",
+                    x="Year_Label",
                     y="Total_Reviews",
                     text=year_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
                     title="Total Reviews by Year"
@@ -465,6 +466,9 @@ if uploaded_file:
                             text="Year",
                             font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
                         ),
+                        type="category",
+                        categoryorder="array",
+                        categoryarray=year_summary["Year_Label"].tolist(),
                         showgrid=False,
                         tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
                     ),
@@ -495,11 +499,12 @@ if uploaded_file:
 
                 avg_year_summary["Dashboard_Year"] = avg_year_summary["Dashboard_Year"].astype(int)
                 avg_year_summary = avg_year_summary.sort_values("Dashboard_Year")
+                avg_year_summary["Year_Label"] = avg_year_summary["Dashboard_Year"].astype(str)
 
                 fig_avg_year = go.Figure()
 
                 fig_avg_year.add_trace(go.Scatter(
-                    x=avg_year_summary["Dashboard_Year"],
+                    x=avg_year_summary["Year_Label"],
                     y=avg_year_summary["Avg_Rating"],
                     mode="lines+markers+text",
                     line=dict(color="#FF8A00", width=4),
@@ -523,6 +528,9 @@ if uploaded_file:
                             text="Year",
                             font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
                         ),
+                        type="category",
+                        categoryorder="array",
+                        categoryarray=avg_year_summary["Year_Label"].tolist(),
                         showgrid=False,
                         tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
                     ),
