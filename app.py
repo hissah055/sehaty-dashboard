@@ -94,17 +94,31 @@ def clean_category(value):
     return value
 
 
+def normalize_col_name(col):
+    return (
+        str(col)
+        .strip()
+        .lower()
+        .replace(" ", "")
+        .replace("_", "")
+        .replace("-", "")
+    )
+
+
+def find_column_by_keywords(columns, keywords):
+    for col in columns:
+        col_clean = normalize_col_name(col)
+        for keyword in keywords:
+            if keyword in col_clean:
+                return col
+    return None
+
+
 def remove_private_columns(dataframe):
     private_cols = []
 
     for col in dataframe.columns:
-        col_text = str(col).strip().lower()
-        col_clean = (
-            col_text
-            .replace(" ", "")
-            .replace("_", "")
-            .replace("-", "")
-        )
+        col_clean = normalize_col_name(col)
 
         if (
             "username" in col_clean
@@ -117,8 +131,71 @@ def remove_private_columns(dataframe):
     return dataframe.drop(columns=private_cols, errors="ignore")
 
 
+def add_time_features(dataframe):
+    df = dataframe.copy()
+
+    year_col = find_column_by_keywords(
+        df.columns,
+        ["reviewyear", "year"]
+    )
+
+    month_col = find_column_by_keywords(
+        df.columns,
+        ["reviewmonth", "month"]
+    )
+
+    date_col = find_column_by_keywords(
+        df.columns,
+        ["reviewdate", "date"]
+    )
+
+    if year_col is not None:
+        df["Dashboard_Year"] = pd.to_numeric(df[year_col], errors="coerce")
+    elif date_col is not None:
+        parsed_dates = pd.to_datetime(df[date_col], errors="coerce", dayfirst=True)
+        df["Dashboard_Year"] = parsed_dates.dt.year
+    else:
+        df["Dashboard_Year"] = pd.NA
+
+    if month_col is not None:
+        df["Dashboard_Month"] = pd.to_numeric(df[month_col], errors="coerce")
+    elif date_col is not None:
+        parsed_dates = pd.to_datetime(df[date_col], errors="coerce", dayfirst=True)
+        df["Dashboard_Month"] = parsed_dates.dt.month
+    else:
+        df["Dashboard_Month"] = pd.NA
+
+    df["Dashboard_Quarter"] = pd.NA
+    valid_months = df["Dashboard_Month"].notna()
+
+    df.loc[valid_months, "Dashboard_Quarter"] = (
+        "Q" + (((df.loc[valid_months, "Dashboard_Month"].astype(int) - 1) // 3) + 1).astype(str)
+    )
+
+    return df
+
+
+def get_sorted_unique(series):
+    values = series.dropna().unique().tolist()
+    try:
+        values = sorted(values)
+    except Exception:
+        values = sorted(values, key=lambda x: str(x))
+    return values
+
+
+def add_axis_style(fig):
+    fig.update_layout(
+        font=dict(color=PLOT_FONT_COLOR),
+        plot_bgcolor=PLOT_BG_COLOR,
+        paper_bgcolor=PLOT_BG_COLOR
+    )
+    return fig
+
+
 if uploaded_file:
     df = load_excel(uploaded_file)
+    df = add_time_features(df)
 
     st.sidebar.header("⚙️ Column Settings")
 
@@ -159,12 +236,129 @@ if uploaded_file:
     )
 
     # =========================
+    # Prepare Filter Data
+    # =========================
+    filter_df = df.copy()
+    filter_df[text_col] = filter_df[text_col].fillna("").astype(str)
+    filter_df[theme_col] = filter_df[theme_col].apply(clean_category)
+    filter_df[subtheme_col] = filter_df[subtheme_col].apply(clean_category)
+    filter_df[language_col] = filter_df[language_col].apply(clean_category)
+    filter_df[rating_col] = pd.to_numeric(filter_df[rating_col], errors="coerce")
+    filter_df["Sentiment_Clean"] = filter_df[sentiment_col].apply(clean_sentiment)
+
+    st.sidebar.markdown("---")
+    st.sidebar.header("🔎 Dashboard Filters")
+
+    year_options = get_sorted_unique(filter_df["Dashboard_Year"])
+    year_options = [int(y) for y in year_options if pd.notna(y)]
+
+    selected_years = st.sidebar.multiselect(
+        "Year",
+        options=year_options,
+        default=year_options
+    )
+
+    quarter_order = ["Q1", "Q2", "Q3", "Q4"]
+    quarter_options = [
+        q for q in quarter_order
+        if q in filter_df["Dashboard_Quarter"].dropna().unique().tolist()
+    ]
+
+    selected_quarters = st.sidebar.multiselect(
+        "Quarter",
+        options=quarter_options,
+        default=quarter_options
+    )
+
+    month_options = get_sorted_unique(filter_df["Dashboard_Month"])
+    month_options = [int(m) for m in month_options if pd.notna(m)]
+
+    selected_months = st.sidebar.multiselect(
+        "Month",
+        options=month_options,
+        default=month_options
+    )
+
+    rating_options = get_sorted_unique(filter_df[rating_col])
+    rating_options = [int(r) if float(r).is_integer() else r for r in rating_options if pd.notna(r)]
+
+    selected_ratings = st.sidebar.multiselect(
+        "Rating",
+        options=rating_options,
+        default=rating_options
+    )
+
+    sentiment_options = ["Positive", "Negative", "Neutral"]
+    sentiment_options = [
+        s for s in sentiment_options
+        if s in filter_df["Sentiment_Clean"].dropna().unique().tolist()
+    ]
+
+    selected_sentiments = st.sidebar.multiselect(
+        "Sentiment",
+        options=sentiment_options,
+        default=sentiment_options
+    )
+
+    theme_options = get_sorted_unique(filter_df[theme_col])
+    selected_themes = st.sidebar.multiselect(
+        "Theme",
+        options=theme_options,
+        default=theme_options
+    )
+
+    subtheme_options = get_sorted_unique(filter_df[subtheme_col])
+    selected_subthemes = st.sidebar.multiselect(
+        "Subtheme",
+        options=subtheme_options,
+        default=subtheme_options
+    )
+
+    language_options = get_sorted_unique(filter_df[language_col])
+    selected_languages = st.sidebar.multiselect(
+        "Language",
+        options=language_options,
+        default=language_options
+    )
+
+    def apply_dashboard_filters(dataframe):
+        result = dataframe.copy()
+
+        if selected_years and "Dashboard_Year" in result.columns:
+            result = result[result["Dashboard_Year"].isin(selected_years)]
+
+        if selected_quarters and "Dashboard_Quarter" in result.columns:
+            result = result[result["Dashboard_Quarter"].isin(selected_quarters)]
+
+        if selected_months and "Dashboard_Month" in result.columns:
+            result = result[result["Dashboard_Month"].isin(selected_months)]
+
+        if selected_ratings:
+            result = result[result[rating_col].isin(selected_ratings)]
+
+        if selected_sentiments:
+            result = result[result["Sentiment_Clean"].isin(selected_sentiments)]
+
+        if selected_themes:
+            result = result[result[theme_col].isin(selected_themes)]
+
+        if selected_subthemes:
+            result = result[result[subtheme_col].isin(selected_subthemes)]
+
+        if selected_languages:
+            result = result[result[language_col].isin(selected_languages)]
+
+        return result
+
+    filtered_preview_df = apply_dashboard_filters(filter_df)
+
+    # =========================
     # Data Preview
     # =========================
     st.subheader("🔍 Data Preview")
-    st.caption("Showing a preview with usernames removed for privacy.")
+    st.caption("Showing a filtered preview with usernames removed for privacy.")
 
-    preview_df = df.head(5).copy()
+    preview_df = filtered_preview_df.head(5).copy()
     preview_df = remove_private_columns(preview_df)
     preview_df.insert(0, "Review_ID", range(1, len(preview_df) + 1))
     preview_df = preview_df.reset_index(drop=True)
@@ -176,42 +370,44 @@ if uploaded_file:
         progress_bar = st.progress(0)
         status_text = st.empty()
 
-        status_text.write("⏳ Preparing data...")
-        progress_bar.progress(15)
+        status_text.write("⏳ Preparing and filtering data...")
+        progress_bar.progress(20)
 
-        df[text_col] = df[text_col].fillna("").astype(str)
-        df[theme_col] = df[theme_col].apply(clean_category)
-        df[subtheme_col] = df[subtheme_col].apply(clean_category)
-        df[language_col] = df[language_col].apply(clean_category)
-        df[rating_col] = pd.to_numeric(df[rating_col], errors="coerce")
+        analysis_source_df = apply_dashboard_filters(filter_df)
 
-        status_text.write("🧹 Cleaning sentiment, themes, and subthemes...")
-        progress_bar.progress(35)
-
-        df["Sentiment_Clean"] = df[sentiment_col].apply(clean_sentiment)
-
-        analysis_df = df[
-            (df["Sentiment_Clean"] != "Unknown") &
-            (df[theme_col] != "Unknown") &
-            (df[subtheme_col] != "Unknown")
+        analysis_df = analysis_source_df[
+            (analysis_source_df["Sentiment_Clean"] != "Unknown") &
+            (analysis_source_df[theme_col] != "Unknown") &
+            (analysis_source_df[subtheme_col] != "Unknown")
         ].copy()
+
+        if analysis_df.empty:
+            status_text.empty()
+            progress_bar.empty()
+            st.warning("⚠️ No data available for the selected filters. Please adjust the filters and try again.")
+            st.stop()
 
         status_text.write("📊 Calculating key indicators...")
         progress_bar.progress(55)
 
-        total_reviews = len(df)
+        total_reviews = len(analysis_source_df)
         avg_rating = analysis_df[rating_col].mean()
         positive_count = (analysis_df["Sentiment_Clean"] == "Positive").sum()
         negative_count = (analysis_df["Sentiment_Clean"] == "Negative").sum()
         neutral_count = (analysis_df["Sentiment_Clean"] == "Neutral").sum()
 
         status_text.write("🎨 Building interactive charts...")
-        progress_bar.progress(80)
+        progress_bar.progress(85)
 
         progress_bar.progress(100)
         status_text.write("✅ Analysis completed successfully!")
 
         st.success("✅ Analysis Completed!")
+
+        st.caption(
+            f"Filtered dataset: {len(analysis_source_df):,} reviews | "
+            f"Valid analysis rows: {len(analysis_df):,}"
+        )
 
         c1, c2, c3, c4, c5 = st.columns(5)
 
@@ -220,6 +416,252 @@ if uploaded_file:
         c3.metric("Positive", f"{positive_count:,}")
         c4.metric("Negative", f"{negative_count:,}")
         c5.metric("Neutral", f"{neutral_count:,}")
+
+        st.markdown("---")
+
+        # =========================
+        # Time Analysis: Year + Quarter
+        # =========================
+        st.subheader("📅 Time-Based Analysis")
+
+        time_col1, time_col2 = st.columns(2)
+
+        with time_col1:
+            year_df = analysis_df.dropna(subset=["Dashboard_Year"]).copy()
+
+            if not year_df.empty:
+                year_summary = year_df.groupby("Dashboard_Year").agg(
+                    Total_Reviews=("Dashboard_Year", "count")
+                ).reset_index()
+
+                year_summary["Dashboard_Year"] = year_summary["Dashboard_Year"].astype(int)
+                year_summary = year_summary.sort_values("Dashboard_Year")
+
+                fig_year = px.bar(
+                    year_summary,
+                    x="Dashboard_Year",
+                    y="Total_Reviews",
+                    text=year_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
+                    title="Total Reviews by Year"
+                )
+
+                fig_year.update_traces(
+                    marker_color="#25B6C8",
+                    textposition="outside",
+                    textfont=dict(color=PLOT_FONT_COLOR, size=13),
+                    cliponaxis=False
+                )
+
+                fig_year.update_layout(
+                    template=PLOT_TEMPLATE,
+                    height=450,
+                    font=dict(color=PLOT_FONT_COLOR),
+                    title=dict(
+                        text="Total Reviews by Year",
+                        font=dict(size=22, color=PLOT_FONT_COLOR)
+                    ),
+                    xaxis=dict(
+                        title=dict(
+                            text="Year",
+                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                        ),
+                        showgrid=False,
+                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    yaxis=dict(
+                        title=dict(
+                            text="Total Reviews",
+                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                        ),
+                        showgrid=False,
+                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    plot_bgcolor=PLOT_BG_COLOR,
+                    paper_bgcolor=PLOT_BG_COLOR,
+                    showlegend=False
+                )
+
+                st.plotly_chart(fig_year, width="stretch")
+            else:
+                st.info("No year data available for the selected filters.")
+
+        with time_col2:
+            year_rating_df = analysis_df.dropna(subset=["Dashboard_Year", rating_col]).copy()
+
+            if not year_rating_df.empty:
+                avg_year_summary = year_rating_df.groupby("Dashboard_Year").agg(
+                    Avg_Rating=(rating_col, "mean")
+                ).reset_index()
+
+                avg_year_summary["Dashboard_Year"] = avg_year_summary["Dashboard_Year"].astype(int)
+                avg_year_summary = avg_year_summary.sort_values("Dashboard_Year")
+
+                fig_avg_year = go.Figure()
+
+                fig_avg_year.add_trace(go.Scatter(
+                    x=avg_year_summary["Dashboard_Year"],
+                    y=avg_year_summary["Avg_Rating"],
+                    mode="lines+markers+text",
+                    line=dict(color="#FF8A00", width=4),
+                    marker=dict(size=11, color="#FF8A00"),
+                    text=[f"{v:.2f}" for v in avg_year_summary["Avg_Rating"]],
+                    textposition="top center",
+                    textfont=dict(color=PLOT_FONT_COLOR, size=13),
+                    name="Avg Rating"
+                ))
+
+                fig_avg_year.update_layout(
+                    template=PLOT_TEMPLATE,
+                    height=450,
+                    title=dict(
+                        text="Avg Rating by Year",
+                        font=dict(size=22, color=PLOT_FONT_COLOR)
+                    ),
+                    font=dict(color=PLOT_FONT_COLOR),
+                    xaxis=dict(
+                        title=dict(
+                            text="Year",
+                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                        ),
+                        showgrid=False,
+                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    yaxis=dict(
+                        title=dict(
+                            text="Avg Rating",
+                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                        ),
+                        range=[0, 5.3],
+                        showgrid=False,
+                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    plot_bgcolor=PLOT_BG_COLOR,
+                    paper_bgcolor=PLOT_BG_COLOR,
+                    showlegend=False
+                )
+
+                st.plotly_chart(fig_avg_year, width="stretch")
+            else:
+                st.info("No yearly rating data available for the selected filters.")
+
+        quarter_col1, quarter_col2 = st.columns(2)
+
+        with quarter_col1:
+            quarter_df = analysis_df.dropna(subset=["Dashboard_Quarter"]).copy()
+
+            if not quarter_df.empty:
+                quarter_summary = quarter_df.groupby("Dashboard_Quarter").agg(
+                    Total_Reviews=("Dashboard_Quarter", "count")
+                ).reset_index()
+
+                quarter_summary["Quarter_Order"] = quarter_summary["Dashboard_Quarter"].map(
+                    {"Q1": 1, "Q2": 2, "Q3": 3, "Q4": 4}
+                )
+
+                quarter_summary = quarter_summary.sort_values("Quarter_Order")
+
+                fig_quarter = px.bar(
+                    quarter_summary,
+                    x="Dashboard_Quarter",
+                    y="Total_Reviews",
+                    text=quarter_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
+                    title="Total Reviews by Quarter"
+                )
+
+                fig_quarter.update_traces(
+                    marker_color="#25B6C8",
+                    textposition="outside",
+                    textfont=dict(color=PLOT_FONT_COLOR, size=13),
+                    cliponaxis=False
+                )
+
+                fig_quarter.update_layout(
+                    template=PLOT_TEMPLATE,
+                    height=450,
+                    title=dict(
+                        text="Total Reviews by Quarter",
+                        font=dict(size=22, color=PLOT_FONT_COLOR)
+                    ),
+                    font=dict(color=PLOT_FONT_COLOR),
+                    xaxis=dict(
+                        title=dict(
+                            text="Quarter",
+                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                        ),
+                        showgrid=False,
+                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    yaxis=dict(
+                        title=dict(
+                            text="Total Reviews",
+                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                        ),
+                        showgrid=False,
+                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    plot_bgcolor=PLOT_BG_COLOR,
+                    paper_bgcolor=PLOT_BG_COLOR,
+                    showlegend=False
+                )
+
+                st.plotly_chart(fig_quarter, width="stretch")
+            else:
+                st.info("No quarter data available for the selected filters.")
+
+        with quarter_col2:
+            rating_dist = analysis_df.dropna(subset=[rating_col]).copy()
+
+            if not rating_dist.empty:
+                rating_summary = rating_dist.groupby(rating_col).size().reset_index(name="Total_Reviews")
+                rating_summary = rating_summary.sort_values(rating_col)
+
+                fig_rating = px.bar(
+                    rating_summary,
+                    x=rating_col,
+                    y="Total_Reviews",
+                    text=rating_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
+                    title="Total Reviews by Rating"
+                )
+
+                fig_rating.update_traces(
+                    marker_color="#25B6C8",
+                    textposition="outside",
+                    textfont=dict(color=PLOT_FONT_COLOR, size=13),
+                    cliponaxis=False
+                )
+
+                fig_rating.update_layout(
+                    template=PLOT_TEMPLATE,
+                    height=450,
+                    title=dict(
+                        text="Total Reviews by Rating",
+                        font=dict(size=22, color=PLOT_FONT_COLOR)
+                    ),
+                    font=dict(color=PLOT_FONT_COLOR),
+                    xaxis=dict(
+                        title=dict(
+                            text="Rating",
+                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                        ),
+                        showgrid=False,
+                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    yaxis=dict(
+                        title=dict(
+                            text="Total Reviews",
+                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                        ),
+                        showgrid=False,
+                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    plot_bgcolor=PLOT_BG_COLOR,
+                    paper_bgcolor=PLOT_BG_COLOR,
+                    showlegend=False
+                )
+
+                st.plotly_chart(fig_rating, width="stretch")
+            else:
+                st.info("No rating data available for the selected filters.")
 
         st.markdown("---")
 
