@@ -507,6 +507,9 @@ def get_sorted_unique(series):
     return values
 
 
+# =========================
+# Clear Filters Function
+# =========================
 def clear_dashboard_filters():
     filter_keys = [
         "filter_years",
@@ -517,13 +520,22 @@ def clear_dashboard_filters():
         "filter_sentiments",
         "filter_themes",
         "filter_subthemes",
-        "analysis_ready",
-        "last_filter_state",
     ]
 
     for key in filter_keys:
-        if key in st.session_state:
-            del st.session_state[key]
+        st.session_state[key] = []
+
+    st.session_state["analysis_ready"] = False
+    st.session_state["last_filter_state"] = (
+        tuple(),
+        tuple(),
+        tuple(),
+        tuple(),
+        tuple(),
+        tuple(),
+        tuple(),
+        tuple(),
+    )
 
 
 if uploaded_file:
@@ -777,9 +789,11 @@ if uploaded_file:
     clear_col, info_col = st.columns([1, 5])
 
     with clear_col:
-        if st.button("🧹 Clear all filters", use_container_width=True):
-            clear_dashboard_filters()
-            st.rerun()
+        st.button(
+            "🧹 Clear all filters",
+            use_container_width=True,
+            on_click=clear_dashboard_filters
+        )
 
     with info_col:
         st.caption("No selection means All. Choose the filters, then click Run Analysis to display the dashboard.")
