@@ -495,9 +495,11 @@ def get_sorted_unique(series):
     return values
 
 
+# =========================
+# Reset Analysis Function
+# =========================
 def clear_dashboard_filters():
     st.session_state["analysis_ready"] = False
-    st.rerun()
 
 
 # =========================
@@ -705,7 +707,6 @@ if uploaded_file:
             options=year_options,
             default=[],
             placeholder="All years"
-           
         )
 
     with f2:
@@ -714,7 +715,6 @@ if uploaded_file:
             options=quarter_options,
             default=[],
             placeholder="All quarters"
-            
         )
 
     with f3:
@@ -723,7 +723,6 @@ if uploaded_file:
             options=month_options,
             default=[],
             placeholder="All months"
-            
         )
 
     with f4:
@@ -732,7 +731,6 @@ if uploaded_file:
             options=rating_options,
             default=[],
             placeholder="All ratings"
-           
         )
 
     f5, f6, f7, f8 = st.columns([1.2, 1.2, 1.6, 1.6])
@@ -743,7 +741,6 @@ if uploaded_file:
             options=language_options,
             default=[],
             placeholder="All languages"
-            
         )
 
     with f6:
@@ -752,7 +749,6 @@ if uploaded_file:
             options=sentiment_options,
             default=[],
             placeholder="All sentiments"
-          
         )
 
     with f7:
@@ -761,7 +757,6 @@ if uploaded_file:
             options=theme_options,
             default=[],
             placeholder="All themes"
-           
         )
 
     with f8:
@@ -770,17 +765,14 @@ if uploaded_file:
             options=subtheme_options,
             default=[],
             placeholder="All subthemes"
-           
         )
 
     clear_col, info_col = st.columns([1, 5])
 
     with clear_col:
-        st.button(
-            "🧹 Clear all filters",
-            use_container_width=True,
-            on_click=clear_dashboard_filters
-        )
+        if st.button("🧹 Reset analysis", use_container_width=True):
+            clear_dashboard_filters()
+            st.rerun()
 
     with info_col:
         st.caption("No selection means All. Choose the filters and search keyword, then click Run Analysis to display the dashboard.")
@@ -794,95 +786,92 @@ if uploaded_file:
 
     search_keyword = st.text_input(
         "Search keyword",
-        placeholder="Example: login, error, appointment, موعد",
-        key="review_search_keyword"
+        placeholder="Example: login, error, appointment, موعد"
     )
 
     # =========================
-# Run Analysis Control
-# =========================
-run_col, note_col = st.columns([1.2, 4.8])
+    # Run Analysis Control
+    # =========================
+    if "analysis_ready" not in st.session_state:
+        st.session_state["analysis_ready"] = False
 
-with run_col:
-    run_analysis = st.button("🚀 Run Analysis", type="primary", use_container_width=True)
+    run_col, note_col = st.columns([1.2, 4.8])
 
-with note_col:
-    st.caption("The charts and results will appear after clicking Run Analysis.")
+    with run_col:
+        run_analysis = st.button("🚀 Run Analysis", type="primary", use_container_width=True)
 
-if "analysis_ready" not in st.session_state:
-    st.session_state["analysis_ready"] = False
+    with note_col:
+        st.caption("The charts and results will appear after clicking Run Analysis.")
 
-if run_analysis:
-    progress_bar = st.progress(0, text="Preparing data...")
+    if run_analysis:
+        progress_bar = st.progress(0, text="Preparing data...")
 
-    progress_bar.progress(25, text="Applying selected filters...")
-    time.sleep(0.25)
+        progress_bar.progress(25, text="Applying selected filters...")
+        time.sleep(0.25)
 
-    progress_bar.progress(55, text="Calculating indicators...")
-    time.sleep(0.25)
+        progress_bar.progress(55, text="Calculating indicators...")
+        time.sleep(0.25)
 
-    progress_bar.progress(80, text="Building charts...")
-    time.sleep(0.25)
+        progress_bar.progress(80, text="Building charts...")
+        time.sleep(0.25)
 
-    progress_bar.progress(100, text="Analysis completed!")
-    time.sleep(0.25)
+        progress_bar.progress(100, text="Analysis completed!")
+        time.sleep(0.25)
 
-    st.session_state["analysis_ready"] = True
-    progress_bar.empty()
+        st.session_state["analysis_ready"] = True
+        progress_bar.empty()
 
-if not st.session_state["analysis_ready"]:
-    st.info("👆 Please choose the filters or search keyword, then click **Run Analysis** to display the dashboard charts and results.")
-    st.stop()
+    if not st.session_state["analysis_ready"]:
+        st.info("👆 Please choose the filters or search keyword, then click **Run Analysis** to display the dashboard charts and results.")
+        st.stop()
 
+    def apply_dashboard_filters(dataframe):
+        result = dataframe.copy()
 
-def apply_dashboard_filters(dataframe):
-    result = dataframe.copy()
+        if selected_years and "Dashboard_Year" in result.columns:
+            result = result[result["Dashboard_Year"].isin(selected_years)]
 
-    if selected_years and "Dashboard_Year" in result.columns:
-        result = result[result["Dashboard_Year"].isin(selected_years)]
+        if selected_quarters and "Dashboard_Quarter" in result.columns:
+            result = result[result["Dashboard_Quarter"].isin(selected_quarters)]
 
-    if selected_quarters and "Dashboard_Quarter" in result.columns:
-        result = result[result["Dashboard_Quarter"].isin(selected_quarters)]
+        if selected_months and "Dashboard_Month" in result.columns:
+            result = result[result["Dashboard_Month"].isin(selected_months)]
 
-    if selected_months and "Dashboard_Month" in result.columns:
-        result = result[result["Dashboard_Month"].isin(selected_months)]
+        if selected_ratings:
+            result = result[result[rating_col].isin(selected_ratings)]
 
-    if selected_ratings:
-        result = result[result[rating_col].isin(selected_ratings)]
+        if selected_languages:
+            result = result[result[language_col].isin(selected_languages)]
 
-    if selected_languages:
-        result = result[result[language_col].isin(selected_languages)]
+        if selected_sentiments:
+            result = result[result["Sentiment_Clean"].isin(selected_sentiments)]
 
-    if selected_sentiments:
-        result = result[result["Sentiment_Clean"].isin(selected_sentiments)]
+        if selected_themes:
+            result = result[result[theme_col].isin(selected_themes)]
 
-    if selected_themes:
-        result = result[result[theme_col].isin(selected_themes)]
+        if selected_subthemes:
+            result = result[result[subtheme_col].isin(selected_subthemes)]
 
-    if selected_subthemes:
-        result = result[result[subtheme_col].isin(selected_subthemes)]
+        return result
 
-    return result
+    analysis_source_df = apply_dashboard_filters(filter_df)
 
+    if search_keyword.strip():
+        analysis_source_df = analysis_source_df[
+            analysis_source_df[text_col]
+            .astype(str)
+            .str.contains(search_keyword.strip(), case=False, na=False)
+        ]
 
-analysis_source_df = apply_dashboard_filters(filter_df)
+    analysis_df = analysis_source_df[
+        (analysis_source_df["Sentiment_Clean"] != "Unknown") &
+        (analysis_source_df[theme_col] != "Unknown") &
+        (analysis_source_df[subtheme_col] != "Unknown")
+    ].copy()
 
-if search_keyword.strip():
-    analysis_source_df = analysis_source_df[
-        analysis_source_df[text_col]
-        .astype(str)
-        .str.contains(search_keyword.strip(), case=False, na=False)
-    ]
-
-analysis_df = analysis_source_df[
-    (analysis_source_df["Sentiment_Clean"] != "Unknown") &
-    (analysis_source_df[theme_col] != "Unknown") &
-    (analysis_source_df[subtheme_col] != "Unknown")
-].copy()
-
-if analysis_df.empty:
-    st.warning("⚠️ No data available for the selected filters or search keyword. Please adjust your selections.")
-    st.stop()
+    if analysis_df.empty:
+        st.warning("⚠️ No data available for the selected filters or search keyword. Please adjust your selections.")
+        st.stop()
 
     # =========================
     # Data Preview at the Top
@@ -1804,4 +1793,3 @@ if analysis_df.empty:
         file_name="sehhaty_filtered_reviews.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         use_container_width=True
-    )
