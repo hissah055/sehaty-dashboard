@@ -32,7 +32,7 @@ def get_logo_html():
         logo_base64 = base64.b64encode(logo_path.read_bytes()).decode()
         return (
             f'<img src="data:image/png;base64,{logo_base64}" '
-            f'style="width:340px; height:190px; object-fit:contain; margin-right:45px;">'
+            f'style="width:300px; height:170px; object-fit:contain; margin-right:45px;">'
         )
 
     return '<div style="font-size:60px; margin-right:20px;">📊</div>'
@@ -519,17 +519,23 @@ if uploaded_file:
 
         st.markdown("---")
 
+        # =========================
+        # Data Sample
+        # =========================
         st.subheader("📄 Data Sample")
-st.caption("Showing a sample of 20 anonymized rows only for faster performance.")
+        st.caption("Showing a sample of 20 anonymized rows only for faster performance.")
 
-sample_df = analysis_df.head(20).copy()
-sample_df.insert(0, "Review_ID", range(1, len(sample_df) + 1))
+        sample_df = analysis_df.head(20).copy()
+        sample_df.insert(0, "Review_ID", range(1, len(sample_df) + 1))
 
-columns_to_remove = ["UserName", "Username", "userName", "User Name", "Name", "Reviewer", "Author"]
+        columns_to_remove = [
+            "UserName", "Username", "userName", "User Name",
+            "Name", "Reviewer", "Author"
+        ]
 
-sample_df = sample_df.drop(
-    columns=[col for col in columns_to_remove if col in sample_df.columns],
-    errors="ignore"
-)
+        sample_df = sample_df.drop(
+            columns=[col for col in columns_to_remove if col in sample_df.columns],
+            errors="ignore"
+        )
 
-st.dataframe(sample_df, width="stretch")
+        st.dataframe(sample_df, width="stretch")
