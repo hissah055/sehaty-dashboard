@@ -23,15 +23,19 @@ st.markdown(
         background-color: #22C55E !important;
     }
 
-    /* General labels - readable in light and dark */
-    label p {
+    /* General labels - teal and clear in light/dark */
+    label p,
+    [data-testid="stWidgetLabel"] p,
+    [data-testid="stWidgetLabel"] span {
         font-weight: 800 !important;
-        color: #111827 !important;
+        color: #14B8D4 !important;
     }
 
     /* Sidebar labels */
-    section[data-testid="stSidebar"] label p {
-        color: #111827 !important;
+    section[data-testid="stSidebar"] label p,
+    section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
+    section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] span {
+        color: #14B8D4 !important;
         font-weight: 800 !important;
     }
 
@@ -46,6 +50,11 @@ st.markdown(
 
     section[data-testid="stSidebar"] div[data-baseweb="select"] * {
         color: #111827 !important;
+    }
+
+    section[data-testid="stSidebar"] div[data-baseweb="select"] svg {
+        fill: #0F766E !important;
+        color: #0F766E !important;
     }
 
     /* Run Analysis button */
@@ -69,10 +78,18 @@ st.markdown(
         font-weight: 700 !important;
     }
 
-    /* Captions */
+    /* Captions - readable in dark and light */
     .stCaption, [data-testid="stCaptionContainer"] {
-        color: #374151 !important;
+        color: #94A3B8 !important;
         font-weight: 600 !important;
+    }
+
+    /* File uploader label */
+    [data-testid="stFileUploader"] label,
+    [data-testid="stFileUploader"] label p,
+    [data-testid="stFileUploader"] span {
+        color: #14B8D4 !important;
+        font-weight: 800 !important;
     }
     </style>
     """,
@@ -344,10 +361,12 @@ if uploaded_file:
     box-shadow: 0 8px 22px rgba(15, 118, 110, 0.25);
 }
 
-/* Filter labels - clear in light and dark */
-label p {
+/* Filter labels - teal in light/dark */
+label p,
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] span {
     font-weight: 800 !important;
-    color: #111827 !important;
+    color: #14B8D4 !important;
 }
 
 /* Main filter boxes */
@@ -402,7 +421,7 @@ div[data-baseweb="popover"] * {
 
 /* Captions */
 .stCaption, [data-testid="stCaptionContainer"] {
-    color: #374151 !important;
+    color: #94A3B8 !important;
     font-weight: 600 !important;
 }
 </style>
