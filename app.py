@@ -29,7 +29,7 @@ def get_logo_html():
         logo_base64 = base64.b64encode(logo_path.read_bytes()).decode()
         return (
             f'<img src="data:image/png;base64,{logo_base64}" '
-            f'style="width:260px; height:110px; object-fit:contain; margin-right:40px;">'
+            f'style="width:340px; height:190px; object-fit:contain; margin-right:45px;">'
         )
 
     return '<div style="font-size:60px; margin-right:20px;">📊</div>'
