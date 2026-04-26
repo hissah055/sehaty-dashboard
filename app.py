@@ -520,5 +520,16 @@ if uploaded_file:
         st.markdown("---")
 
         st.subheader("📄 Data Sample")
-        st.caption("Showing a sample of 20 rows only for faster performance.")
-        st.dataframe(analysis_df.head(20), use_container_width=True)
+st.caption("Showing a sample of 20 anonymized rows only for faster performance.")
+
+sample_df = analysis_df.head(20).copy()
+sample_df.insert(0, "Review_ID", range(1, len(sample_df) + 1))
+
+columns_to_remove = ["UserName", "Username", "userName", "User Name", "Name", "Reviewer", "Author"]
+
+sample_df = sample_df.drop(
+    columns=[col for col in columns_to_remove if col in sample_df.columns],
+    errors="ignore"
+)
+
+st.dataframe(sample_df, width="stretch")
