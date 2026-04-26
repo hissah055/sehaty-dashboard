@@ -184,19 +184,30 @@ def get_sorted_unique(series):
     return values
 
 
-def add_axis_style(fig):
-    fig.update_layout(
-        font=dict(color=PLOT_FONT_COLOR),
-        plot_bgcolor=PLOT_BG_COLOR,
-        paper_bgcolor=PLOT_BG_COLOR
-    )
-    return fig
+def clear_dashboard_filters():
+    filter_keys = [
+        "filter_years",
+        "filter_quarters",
+        "filter_months",
+        "filter_ratings",
+        "filter_languages",
+        "filter_sentiments",
+        "filter_themes",
+        "filter_subthemes",
+    ]
+
+    for key in filter_keys:
+        if key in st.session_state:
+            del st.session_state[key]
 
 
 if uploaded_file:
     df = load_excel(uploaded_file)
     df = add_time_features(df)
 
+    # =========================
+    # Column Settings
+    # =========================
     st.sidebar.header("⚙️ Column Settings")
 
     text_col = st.sidebar.selectbox(
@@ -246,17 +257,129 @@ if uploaded_file:
     filter_df[rating_col] = pd.to_numeric(filter_df[rating_col], errors="coerce")
     filter_df["Sentiment_Clean"] = filter_df[sentiment_col].apply(clean_sentiment)
 
-    st.sidebar.markdown("---")
-    st.sidebar.header("🔎 Dashboard Filters")
+    # =========================
+    # Top Dashboard Filters + Crystal Arrow Style
+    # =========================
+    filter_style_html = """
+<style>
+.filter-title {
+    background: linear-gradient(135deg, #0891B2, #0F766E);
+    color: white;
+    padding: 12px 18px;
+    border-radius: 16px;
+    font-size: 22px;
+    font-weight: 800;
+    margin-top: 10px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+
+/* صندوق الفلتر */
+.filter-card {
+    position: relative;
+    background: linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 18px;
+    padding: 12px 14px 10px 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.16);
+    overflow: hidden;
+}
+
+/* لمعة كريستال ناعمة */
+.filter-card::before {
+    content: "";
+    position: absolute;
+    top: -45%;
+    left: -35%;
+    width: 42%;
+    height: 190%;
+    background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0.00) 0%,
+        rgba(255,255,255,0.10) 35%,
+        rgba(255,255,255,0.32) 50%,
+        rgba(255,255,255,0.08) 65%,
+        rgba(255,255,255,0.00) 100%
+    );
+    transform: rotate(18deg);
+    animation: crystalShine 4s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* سهم فضي كريستال */
+.filter-card::after {
+    content: "❯";
+    position: absolute;
+    right: 15px;
+    top: 18px;
+    font-size: 19px;
+    font-weight: bold;
+    color: #E5E7EB;
+    text-shadow:
+        0 0 4px rgba(255,255,255,0.65),
+        0 0 10px rgba(220,230,240,0.45);
+    animation: arrowFloat 2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* حركة اللمعة */
+@keyframes crystalShine {
+    0%   { left: -35%; opacity: 0.12; }
+    50%  { left: 45%; opacity: 0.55; }
+    100% { left: 120%; opacity: 0.08; }
+}
+
+/* حركة السهم */
+@keyframes arrowFloat {
+    0%   { transform: translateY(0px); opacity: 0.75; }
+    50%  { transform: translateY(-2px); opacity: 1; }
+    100% { transform: translateY(0px); opacity: 0.75; }
+}
+
+/* تنسيق الليبل */
+label p {
+    font-weight: 800 !important;
+    color: #F8FAFC !important;
+}
+
+/* تحسين شكل multiselect */
+div[data-baseweb="select"] > div {
+    background-color: rgba(255,255,255,0.07) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    border-radius: 14px !important;
+    color: white !important;
+    box-shadow: inset 0 0 8px rgba(255,255,255,0.05);
+}
+
+/* النص داخل الفلاتر */
+div[data-baseweb="select"] * {
+    color: #FFFFFF !important;
+}
+
+/* السهم الداخلي الأصلي نخليه فضي */
+div[data-baseweb="select"] svg {
+    fill: #E5E7EB !important;
+    color: #E5E7EB !important;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.45));
+}
+
+/* الكروت عند المرور عليها */
+.filter-card:hover {
+    transform: translateY(-2px);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+    border-color: rgba(255,255,255,0.30);
+}
+</style>
+<div class="filter-title">🔎 Dashboard Filters</div>
+"""
+    st.markdown(filter_style_html, unsafe_allow_html=True)
 
     year_options = get_sorted_unique(filter_df["Dashboard_Year"])
     year_options = [int(y) for y in year_options if pd.notna(y)]
-
-    selected_years = st.sidebar.multiselect(
-        "Year",
-        options=year_options,
-        default=year_options
-    )
 
     quarter_order = ["Q1", "Q2", "Q3", "Q4"]
     quarter_options = [
@@ -264,29 +387,17 @@ if uploaded_file:
         if q in filter_df["Dashboard_Quarter"].dropna().unique().tolist()
     ]
 
-    selected_quarters = st.sidebar.multiselect(
-        "Quarter",
-        options=quarter_options,
-        default=quarter_options
-    )
-
     month_options = get_sorted_unique(filter_df["Dashboard_Month"])
     month_options = [int(m) for m in month_options if pd.notna(m)]
 
-    selected_months = st.sidebar.multiselect(
-        "Month",
-        options=month_options,
-        default=month_options
-    )
-
     rating_options = get_sorted_unique(filter_df[rating_col])
-    rating_options = [int(r) if float(r).is_integer() else r for r in rating_options if pd.notna(r)]
+    rating_options = [
+        int(r) if float(r).is_integer() else r
+        for r in rating_options
+        if pd.notna(r)
+    ]
 
-    selected_ratings = st.sidebar.multiselect(
-        "Rating",
-        options=rating_options,
-        default=rating_options
-    )
+    language_options = get_sorted_unique(filter_df[language_col])
 
     sentiment_options = ["Positive", "Negative", "Neutral"]
     sentiment_options = [
@@ -294,32 +405,102 @@ if uploaded_file:
         if s in filter_df["Sentiment_Clean"].dropna().unique().tolist()
     ]
 
-    selected_sentiments = st.sidebar.multiselect(
-        "Sentiment",
-        options=sentiment_options,
-        default=sentiment_options
-    )
-
     theme_options = get_sorted_unique(filter_df[theme_col])
-    selected_themes = st.sidebar.multiselect(
-        "Theme",
-        options=theme_options,
-        default=theme_options
-    )
-
     subtheme_options = get_sorted_unique(filter_df[subtheme_col])
-    selected_subthemes = st.sidebar.multiselect(
-        "Subtheme",
-        options=subtheme_options,
-        default=subtheme_options
-    )
 
-    language_options = get_sorted_unique(filter_df[language_col])
-    selected_languages = st.sidebar.multiselect(
-        "Language",
-        options=language_options,
-        default=language_options
-    )
+    f1, f2, f3, f4 = st.columns(4)
+
+    with f1:
+        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
+        selected_years = st.multiselect(
+            "Review Year",
+            options=year_options,
+            default=year_options,
+            key="filter_years"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with f2:
+        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
+        selected_quarters = st.multiselect(
+            "Quarter",
+            options=quarter_options,
+            default=quarter_options,
+            key="filter_quarters"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with f3:
+        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
+        selected_months = st.multiselect(
+            "Month",
+            options=month_options,
+            default=month_options,
+            key="filter_months"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with f4:
+        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
+        selected_ratings = st.multiselect(
+            "Rating",
+            options=rating_options,
+            default=rating_options,
+            key="filter_ratings"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    f5, f6, f7, f8 = st.columns([1.2, 1.2, 1.6, 1.6])
+
+    with f5:
+        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
+        selected_languages = st.multiselect(
+            "Language",
+            options=language_options,
+            default=language_options,
+            key="filter_languages"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with f6:
+        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
+        selected_sentiments = st.multiselect(
+            "Sentiment",
+            options=sentiment_options,
+            default=sentiment_options,
+            key="filter_sentiments"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with f7:
+        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
+        selected_themes = st.multiselect(
+            "Theme",
+            options=theme_options,
+            default=theme_options,
+            key="filter_themes"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with f8:
+        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
+        selected_subthemes = st.multiselect(
+            "Subtheme",
+            options=subtheme_options,
+            default=subtheme_options,
+            key="filter_subthemes"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    clear_col, info_col = st.columns([1, 5])
+
+    with clear_col:
+        if st.button("🧹 Clear all filters", use_container_width=True):
+            clear_dashboard_filters()
+            st.rerun()
+
+    with info_col:
+        st.caption("Changing any filter updates all KPI cards, insights, charts, and data preview automatically.")
 
     def apply_dashboard_filters(dataframe):
         result = dataframe.copy()
@@ -336,6 +517,9 @@ if uploaded_file:
         if selected_ratings:
             result = result[result[rating_col].isin(selected_ratings)]
 
+        if selected_languages:
+            result = result[result[language_col].isin(selected_languages)]
+
         if selected_sentiments:
             result = result[result["Sentiment_Clean"].isin(selected_sentiments)]
 
@@ -345,74 +529,37 @@ if uploaded_file:
         if selected_subthemes:
             result = result[result[subtheme_col].isin(selected_subthemes)]
 
-        if selected_languages:
-            result = result[result[language_col].isin(selected_languages)]
-
         return result
 
-    filtered_preview_df = apply_dashboard_filters(filter_df)
+    analysis_source_df = apply_dashboard_filters(filter_df)
+
+    analysis_df = analysis_source_df[
+        (analysis_source_df["Sentiment_Clean"] != "Unknown") &
+        (analysis_source_df[theme_col] != "Unknown") &
+        (analysis_source_df[subtheme_col] != "Unknown")
+    ].copy()
+
+    if analysis_df.empty:
+        st.warning("⚠️ No data available for the selected filters. Please adjust the filters.")
+        st.stop()
+
+    st.success("✅ Analysis Completed!")
+
+    total_reviews = len(analysis_source_df)
+    avg_rating = analysis_df[rating_col].mean()
+    positive_count = (analysis_df["Sentiment_Clean"] == "Positive").sum()
+    negative_count = (analysis_df["Sentiment_Clean"] == "Negative").sum()
+    neutral_count = (analysis_df["Sentiment_Clean"] == "Neutral").sum()
+
+    st.caption(
+        f"Filtered dataset: {len(analysis_source_df):,} reviews | "
+        f"Valid analysis rows: {len(analysis_df):,}"
+    )
 
     # =========================
-    # Data Preview
+    # KPI Metric Cards
     # =========================
-    st.subheader("🔍 Data Preview")
-    st.caption("Showing a filtered preview with usernames removed for privacy.")
-
-    preview_df = filtered_preview_df.head(5).copy()
-    preview_df = remove_private_columns(preview_df)
-    preview_df.insert(0, "Review_ID", range(1, len(preview_df) + 1))
-    preview_df = preview_df.reset_index(drop=True)
-
-    st.dataframe(preview_df, width="stretch", hide_index=True)
-
-    if st.button("🚀 Start Analysis"):
-
-        progress_bar = st.progress(0)
-        status_text = st.empty()
-
-        status_text.write("⏳ Preparing and filtering data...")
-        progress_bar.progress(20)
-
-        analysis_source_df = apply_dashboard_filters(filter_df)
-
-        analysis_df = analysis_source_df[
-            (analysis_source_df["Sentiment_Clean"] != "Unknown") &
-            (analysis_source_df[theme_col] != "Unknown") &
-            (analysis_source_df[subtheme_col] != "Unknown")
-        ].copy()
-
-        if analysis_df.empty:
-            status_text.empty()
-            progress_bar.empty()
-            st.warning("⚠️ No data available for the selected filters. Please adjust the filters and try again.")
-            st.stop()
-
-        status_text.write("📊 Calculating key indicators...")
-        progress_bar.progress(55)
-
-        total_reviews = len(analysis_source_df)
-        avg_rating = analysis_df[rating_col].mean()
-        positive_count = (analysis_df["Sentiment_Clean"] == "Positive").sum()
-        negative_count = (analysis_df["Sentiment_Clean"] == "Negative").sum()
-        neutral_count = (analysis_df["Sentiment_Clean"] == "Neutral").sum()
-
-        status_text.write("🎨 Building interactive charts...")
-        progress_bar.progress(85)
-
-        progress_bar.progress(100)
-        status_text.write("✅ Analysis completed successfully!")
-
-        st.success("✅ Analysis Completed!")
-
-        st.caption(
-            f"Filtered dataset: {len(analysis_source_df):,} reviews | "
-            f"Valid analysis rows: {len(analysis_df):,}"
-        )
-
-        # =========================
-        # KPI Metric Cards
-        # =========================
-        metric_cards_html = f"""
+    metric_cards_html = f"""
 <style>
 .metric-grid {{
     display: grid;
@@ -463,54 +610,54 @@ if uploaded_file:
 </style>
 <div class="metric-grid"><div class="metric-card"><div class="metric-label"><span class="metric-icon">📝</span>Total Reviews</div><div class="metric-value">{total_reviews:,}</div></div><div class="metric-card"><div class="metric-label"><span class="metric-icon">⭐</span>Avg Rating</div><div class="metric-value">{avg_rating:.2f}</div></div><div class="metric-card"><div class="metric-label"><span class="metric-icon">😊</span>Positive</div><div class="metric-value">{positive_count:,}</div></div><div class="metric-card"><div class="metric-label"><span class="metric-icon">😟</span>Negative</div><div class="metric-value">{negative_count:,}</div></div><div class="metric-card"><div class="metric-label"><span class="metric-icon">😐</span>Neutral</div><div class="metric-value">{neutral_count:,}</div></div></div>
 """
-        st.markdown(metric_cards_html, unsafe_allow_html=True)
+    st.markdown(metric_cards_html, unsafe_allow_html=True)
 
-        # =========================
-        # Smart Insights Summary
-        # =========================
-        st.markdown("---")
-        st.subheader("✨ Smart Insights Summary")
+    # =========================
+    # Smart Insights Summary
+    # =========================
+    st.markdown("---")
+    st.subheader("✨ Smart Insights Summary")
 
-        top_year_text = "N/A"
-        best_year_text = "N/A"
-        top_theme_text = "N/A"
-        negative_theme_text = "N/A"
-        top_subtheme_text = "N/A"
-        negative_rate_text = "0%"
+    top_year_text = "N/A"
+    best_year_text = "N/A"
+    top_theme_text = "N/A"
+    negative_theme_text = "N/A"
+    top_subtheme_text = "N/A"
+    negative_rate_text = "0%"
 
-        year_insight_df = analysis_df.dropna(subset=["Dashboard_Year"]).copy()
-        if not year_insight_df.empty:
-            year_counts = year_insight_df.groupby("Dashboard_Year").size()
-            top_year = int(year_counts.idxmax())
-            top_year_count = int(year_counts.max())
-            top_year_text = f"{top_year} ({top_year_count:,})"
+    year_insight_df = analysis_df.dropna(subset=["Dashboard_Year"]).copy()
+    if not year_insight_df.empty:
+        year_counts = year_insight_df.groupby("Dashboard_Year").size()
+        top_year = int(year_counts.idxmax())
+        top_year_count = int(year_counts.max())
+        top_year_text = f"{top_year} ({top_year_count:,})"
 
-        year_rating_insight_df = analysis_df.dropna(subset=["Dashboard_Year", rating_col]).copy()
-        if not year_rating_insight_df.empty:
-            avg_by_year = year_rating_insight_df.groupby("Dashboard_Year")[rating_col].mean()
-            best_year = int(avg_by_year.idxmax())
-            best_year_rating = avg_by_year.max()
-            best_year_text = f"{best_year} ({best_year_rating:.2f})"
+    year_rating_insight_df = analysis_df.dropna(subset=["Dashboard_Year", rating_col]).copy()
+    if not year_rating_insight_df.empty:
+        avg_by_year = year_rating_insight_df.groupby("Dashboard_Year")[rating_col].mean()
+        best_year = int(avg_by_year.idxmax())
+        best_year_rating = avg_by_year.max()
+        best_year_text = f"{best_year} ({best_year_rating:.2f})"
 
-        theme_counts = analysis_df[theme_col].value_counts()
-        if not theme_counts.empty:
-            top_theme_text = f"{theme_counts.index[0]} ({theme_counts.iloc[0]:,})"
+    theme_counts = analysis_df[theme_col].value_counts()
+    if not theme_counts.empty:
+        top_theme_text = f"{theme_counts.index[0]} ({theme_counts.iloc[0]:,})"
 
-        negative_df = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
-        if not negative_df.empty:
-            negative_theme_counts = negative_df[theme_col].value_counts()
-            if not negative_theme_counts.empty:
-                negative_theme_text = f"{negative_theme_counts.index[0]} ({negative_theme_counts.iloc[0]:,})"
+    negative_df = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
+    if not negative_df.empty:
+        negative_theme_counts = negative_df[theme_col].value_counts()
+        if not negative_theme_counts.empty:
+            negative_theme_text = f"{negative_theme_counts.index[0]} ({negative_theme_counts.iloc[0]:,})"
 
-        subtheme_counts = analysis_df[subtheme_col].value_counts()
-        if not subtheme_counts.empty:
-            top_subtheme_text = f"{subtheme_counts.index[0]} ({subtheme_counts.iloc[0]:,})"
+    subtheme_counts = analysis_df[subtheme_col].value_counts()
+    if not subtheme_counts.empty:
+        top_subtheme_text = f"{subtheme_counts.index[0]} ({subtheme_counts.iloc[0]:,})"
 
-        if len(analysis_df) > 0:
-            negative_rate = (negative_count / len(analysis_df)) * 100
-            negative_rate_text = f"{negative_rate:.1f}%"
+    if len(analysis_df) > 0:
+        negative_rate = (negative_count / len(analysis_df)) * 100
+        negative_rate_text = f"{negative_rate:.1f}%"
 
-        insights_html = f"""
+    insights_html = f"""
 <style>
 .insight-grid {{
     display: grid;
@@ -559,410 +706,196 @@ if uploaded_file:
 </style>
 <div class="insight-grid"><div class="insight-card"><span class="insight-icon">📅</span><div class="insight-title">Most Active Year</div><div class="insight-value">{top_year_text}</div></div><div class="insight-card"><span class="insight-icon">⭐</span><div class="insight-title">Best Avg Rating Year</div><div class="insight-value">{best_year_text}</div></div><div class="insight-card"><span class="insight-icon">🏆</span><div class="insight-title">Top Theme</div><div class="insight-value">{top_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🔥</span><div class="insight-title">Most Negative Theme</div><div class="insight-value">{negative_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🧩</span><div class="insight-title">Top Subtheme</div><div class="insight-value">{top_subtheme_text}</div></div><div class="insight-card"><span class="insight-icon">📉</span><div class="insight-title">Negative Reviews Rate</div><div class="insight-value">{negative_rate_text}</div></div></div>
 """
-        st.markdown(insights_html, unsafe_allow_html=True)
+    st.markdown(insights_html, unsafe_allow_html=True)
 
-        st.markdown("---")
+    st.markdown("---")
 
-        # =========================
-        # Time Analysis: Year + Quarter
-        # =========================
-        st.subheader("📅 Time-Based Analysis")
+    # =========================
+    # Data Preview
+    # =========================
+    st.subheader("🔍 Data Preview")
+    st.caption("Showing a filtered preview with usernames removed for privacy.")
 
-        time_col1, time_col2 = st.columns(2)
+    preview_df = analysis_source_df.head(5).copy()
+    preview_df = remove_private_columns(preview_df)
+    preview_df.insert(0, "Review_ID", range(1, len(preview_df) + 1))
+    preview_df = preview_df.reset_index(drop=True)
 
-        with time_col1:
-            year_df = analysis_df.dropna(subset=["Dashboard_Year"]).copy()
+    st.dataframe(preview_df, width="stretch", hide_index=True)
 
-            if not year_df.empty:
-                year_summary = year_df.groupby("Dashboard_Year").agg(
-                    Total_Reviews=("Dashboard_Year", "count")
-                ).reset_index()
+    st.markdown("---")
 
-                year_summary["Dashboard_Year"] = year_summary["Dashboard_Year"].astype(int)
-                year_summary = year_summary.sort_values("Dashboard_Year")
-                year_summary["Year_Label"] = year_summary["Dashboard_Year"].astype(str)
+    # =========================
+    # Time Analysis: Year + Quarter
+    # =========================
+    st.subheader("📅 Time-Based Analysis")
 
-                fig_year = px.bar(
-                    year_summary,
-                    x="Year_Label",
-                    y="Total_Reviews",
-                    text=year_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
-                    title="Total Reviews by Year"
-                )
+    time_col1, time_col2 = st.columns(2)
 
-                fig_year.update_traces(
-                    marker_color="#25B6C8",
-                    textposition="outside",
-                    textfont=dict(color=PLOT_FONT_COLOR, size=13),
-                    cliponaxis=False
-                )
+    with time_col1:
+        year_df = analysis_df.dropna(subset=["Dashboard_Year"]).copy()
 
-                fig_year.update_layout(
-                    template=PLOT_TEMPLATE,
-                    height=450,
-                    font=dict(color=PLOT_FONT_COLOR),
-                    title=dict(
-                        text="Total Reviews by Year",
-                        font=dict(size=22, color=PLOT_FONT_COLOR)
-                    ),
-                    xaxis=dict(
-                        title=dict(
-                            text="Year",
-                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                        ),
-                        type="category",
-                        categoryorder="array",
-                        categoryarray=year_summary["Year_Label"].tolist(),
-                        showgrid=False,
-                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-                    ),
-                    yaxis=dict(
-                        title=dict(
-                            text="Total Reviews",
-                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                        ),
-                        showgrid=False,
-                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-                    ),
-                    plot_bgcolor=PLOT_BG_COLOR,
-                    paper_bgcolor=PLOT_BG_COLOR,
-                    showlegend=False
-                )
+        if not year_df.empty:
+            year_summary = year_df.groupby("Dashboard_Year").agg(
+                Total_Reviews=("Dashboard_Year", "count")
+            ).reset_index()
 
-                st.plotly_chart(fig_year, width="stretch")
-            else:
-                st.info("No year data available for the selected filters.")
+            year_summary["Dashboard_Year"] = year_summary["Dashboard_Year"].astype(int)
+            year_summary = year_summary.sort_values("Dashboard_Year")
+            year_summary["Year_Label"] = year_summary["Dashboard_Year"].astype(str)
 
-        with time_col2:
-            year_rating_df = analysis_df.dropna(subset=["Dashboard_Year", rating_col]).copy()
-
-            if not year_rating_df.empty:
-                avg_year_summary = year_rating_df.groupby("Dashboard_Year").agg(
-                    Avg_Rating=(rating_col, "mean")
-                ).reset_index()
-
-                avg_year_summary["Dashboard_Year"] = avg_year_summary["Dashboard_Year"].astype(int)
-                avg_year_summary = avg_year_summary.sort_values("Dashboard_Year")
-                avg_year_summary["Year_Label"] = avg_year_summary["Dashboard_Year"].astype(str)
-
-                fig_avg_year = go.Figure()
-
-                fig_avg_year.add_trace(go.Scatter(
-                    x=avg_year_summary["Year_Label"],
-                    y=avg_year_summary["Avg_Rating"],
-                    mode="lines+markers+text",
-                    line=dict(color="#FF8A00", width=4),
-                    marker=dict(size=11, color="#FF8A00"),
-                    text=[f"{v:.2f}" for v in avg_year_summary["Avg_Rating"]],
-                    textposition="top center",
-                    textfont=dict(color=PLOT_FONT_COLOR, size=13),
-                    name="Avg Rating"
-                ))
-
-                fig_avg_year.update_layout(
-                    template=PLOT_TEMPLATE,
-                    height=450,
-                    title=dict(
-                        text="Avg Rating by Year",
-                        font=dict(size=22, color=PLOT_FONT_COLOR)
-                    ),
-                    font=dict(color=PLOT_FONT_COLOR),
-                    xaxis=dict(
-                        title=dict(
-                            text="Year",
-                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                        ),
-                        type="category",
-                        categoryorder="array",
-                        categoryarray=avg_year_summary["Year_Label"].tolist(),
-                        showgrid=False,
-                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-                    ),
-                    yaxis=dict(
-                        title=dict(
-                            text="Avg Rating",
-                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                        ),
-                        range=[0, 5.3],
-                        showgrid=False,
-                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-                    ),
-                    plot_bgcolor=PLOT_BG_COLOR,
-                    paper_bgcolor=PLOT_BG_COLOR,
-                    showlegend=False
-                )
-
-                st.plotly_chart(fig_avg_year, width="stretch")
-            else:
-                st.info("No yearly rating data available for the selected filters.")
-
-        quarter_col1, quarter_col2 = st.columns(2)
-
-        with quarter_col1:
-            quarter_df = analysis_df.dropna(subset=["Dashboard_Quarter"]).copy()
-
-            if not quarter_df.empty:
-                quarter_summary = quarter_df.groupby("Dashboard_Quarter").agg(
-                    Total_Reviews=("Dashboard_Quarter", "count")
-                ).reset_index()
-
-                quarter_summary["Quarter_Order"] = quarter_summary["Dashboard_Quarter"].map(
-                    {"Q1": 1, "Q2": 2, "Q3": 3, "Q4": 4}
-                )
-
-                quarter_summary = quarter_summary.sort_values("Quarter_Order")
-
-                fig_quarter = px.bar(
-                    quarter_summary,
-                    x="Dashboard_Quarter",
-                    y="Total_Reviews",
-                    text=quarter_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
-                    title="Total Reviews by Quarter"
-                )
-
-                fig_quarter.update_traces(
-                    marker_color="#25B6C8",
-                    textposition="outside",
-                    textfont=dict(color=PLOT_FONT_COLOR, size=13),
-                    cliponaxis=False
-                )
-
-                fig_quarter.update_layout(
-                    template=PLOT_TEMPLATE,
-                    height=450,
-                    title=dict(
-                        text="Total Reviews by Quarter",
-                        font=dict(size=22, color=PLOT_FONT_COLOR)
-                    ),
-                    font=dict(color=PLOT_FONT_COLOR),
-                    xaxis=dict(
-                        title=dict(
-                            text="Quarter",
-                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                        ),
-                        showgrid=False,
-                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-                    ),
-                    yaxis=dict(
-                        title=dict(
-                            text="Total Reviews",
-                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                        ),
-                        showgrid=False,
-                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-                    ),
-                    plot_bgcolor=PLOT_BG_COLOR,
-                    paper_bgcolor=PLOT_BG_COLOR,
-                    showlegend=False
-                )
-
-                st.plotly_chart(fig_quarter, width="stretch")
-            else:
-                st.info("No quarter data available for the selected filters.")
-
-        with quarter_col2:
-            rating_dist = analysis_df.dropna(subset=[rating_col]).copy()
-
-            if not rating_dist.empty:
-                rating_summary = rating_dist.groupby(rating_col).size().reset_index(name="Total_Reviews")
-                rating_summary = rating_summary.sort_values(rating_col)
-
-                fig_rating = px.bar(
-                    rating_summary,
-                    x=rating_col,
-                    y="Total_Reviews",
-                    text=rating_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
-                    title="Total Reviews by Rating"
-                )
-
-                fig_rating.update_traces(
-                    marker_color="#25B6C8",
-                    textposition="outside",
-                    textfont=dict(color=PLOT_FONT_COLOR, size=13),
-                    cliponaxis=False
-                )
-
-                fig_rating.update_layout(
-                    template=PLOT_TEMPLATE,
-                    height=450,
-                    title=dict(
-                        text="Total Reviews by Rating",
-                        font=dict(size=22, color=PLOT_FONT_COLOR)
-                    ),
-                    font=dict(color=PLOT_FONT_COLOR),
-                    xaxis=dict(
-                        title=dict(
-                            text="Rating",
-                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                        ),
-                        showgrid=False,
-                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-                    ),
-                    yaxis=dict(
-                        title=dict(
-                            text="Total Reviews",
-                            font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                        ),
-                        showgrid=False,
-                        tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-                    ),
-                    plot_bgcolor=PLOT_BG_COLOR,
-                    paper_bgcolor=PLOT_BG_COLOR,
-                    showlegend=False
-                )
-
-                st.plotly_chart(fig_rating, width="stretch")
-            else:
-                st.info("No rating data available for the selected filters.")
-
-        st.markdown("---")
-
-        # =========================
-        # Reviews & Avg Rating by Theme
-        # =========================
-        st.subheader("📊 Reviews & Avg Rating by Theme")
-
-        theme_summary = analysis_df.groupby(theme_col).agg(
-            Total_Reviews=(theme_col, "count"),
-            Avg_Rating=(rating_col, "mean")
-        ).reset_index()
-
-        theme_summary = theme_summary.sort_values(by="Total_Reviews", ascending=False)
-
-        fig_theme = go.Figure()
-
-        fig_theme.add_trace(go.Bar(
-            x=theme_summary[theme_col].astype(str),
-            y=theme_summary["Total_Reviews"],
-            name="Total Reviews",
-            marker_color="#25B6C8",
-            text=theme_summary["Total_Reviews"],
-            texttemplate="%{text:,}",
-            textposition="outside",
-            textfont=dict(size=12, color=PLOT_FONT_COLOR),
-            cliponaxis=False,
-            hovertemplate="<b>%{x}</b><br>Total Reviews: %{y:,}<extra></extra>"
-        ))
-
-        fig_theme.add_trace(go.Scatter(
-            x=theme_summary[theme_col].astype(str),
-            y=theme_summary["Avg_Rating"],
-            name="Avg Rating",
-            mode="lines+markers+text",
-            yaxis="y2",
-            line=dict(color="#FF8A00", width=4),
-            marker=dict(size=11, color="#FF8A00"),
-            text=[f"{v:.2f}" for v in theme_summary["Avg_Rating"]],
-            textposition=["bottom center"] + ["top center"] * (len(theme_summary) - 1),
-            textfont=dict(color=PLOT_FONT_COLOR, size=14),
-            hovertemplate="<b>%{x}</b><br>Avg Rating: %{y:.2f}<extra></extra>"
-        ))
-
-        fig_theme.update_layout(
-            template=PLOT_TEMPLATE,
-            height=590,
-            title=dict(
-                text="Reviews & Avg Rating by Theme",
-                font=dict(size=PLOT_TITLE_SIZE, color=PLOT_FONT_COLOR)
-            ),
-            font=dict(color=PLOT_FONT_COLOR),
-            showlegend=True,
-            legend=dict(
-                orientation="h",
-                y=1.08,
-                x=0.38,
-                font=dict(size=15, color=PLOT_FONT_COLOR),
-                title=dict(font=dict(color=PLOT_FONT_COLOR))
-            ),
-            xaxis=dict(
-                title=dict(
-                    text="Theme",
-                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                ),
-                tickangle=-25,
-                showgrid=False,
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-            ),
-            yaxis=dict(
-                title=dict(
-                    text="Total Reviews",
-                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                ),
-                type="linear",
-                showgrid=False,
-                zeroline=False,
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-            ),
-            yaxis2=dict(
-                title=dict(
-                    text="Avg Rating",
-                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                ),
-                overlaying="y",
-                side="right",
-                range=[0, 5.3],
-                showgrid=False,
-                zeroline=False,
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
-            ),
-            plot_bgcolor=PLOT_BG_COLOR,
-            paper_bgcolor=PLOT_BG_COLOR,
-            margin=dict(t=105, b=125, l=80, r=80)
-        )
-
-        st.plotly_chart(fig_theme, width="stretch")
-
-        st.markdown("---")
-
-        # =========================
-        # Sentiment & Language
-        # =========================
-        colA, colB = st.columns(2)
-
-        with colA:
-            st.subheader("😊 Sentiment Distribution")
-
-            sentiment_data = analysis_df["Sentiment_Clean"].value_counts().reset_index()
-            sentiment_data.columns = ["Sentiment", "Count"]
-
-            fig_sent = px.bar(
-                sentiment_data,
-                x="Sentiment",
-                y="Count",
-                color="Sentiment",
-                text=sentiment_data["Count"].apply(lambda x: f"{x:,}"),
-                color_discrete_map={
-                    "Positive": "#10B981",
-                    "Negative": "#EF4444",
-                    "Neutral": "#3B82F6"
-                }
+            fig_year = px.bar(
+                year_summary,
+                x="Year_Label",
+                y="Total_Reviews",
+                text=year_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
+                title="Total Reviews by Year"
             )
 
-            fig_sent.update_traces(
+            fig_year.update_traces(
+                marker_color="#25B6C8",
                 textposition="outside",
-                textfont=dict(size=14, color=PLOT_FONT_COLOR),
+                textfont=dict(color=PLOT_FONT_COLOR, size=13),
                 cliponaxis=False
             )
 
-            fig_sent.update_layout(
+            fig_year.update_layout(
                 template=PLOT_TEMPLATE,
-                height=480,
-                bargap=0.3,
-                title=dict(
-                    text="Sentiment Distribution",
-                    font=dict(size=22, color=PLOT_FONT_COLOR)
-                ),
+                height=450,
                 font=dict(color=PLOT_FONT_COLOR),
-                legend=dict(
-                    title=dict(
-                        text="Sentiment",
-                        font=dict(size=14, color=PLOT_FONT_COLOR)
-                    ),
-                    font=dict(size=14, color=PLOT_FONT_COLOR)
+                title=dict(
+                    text="Total Reviews by Year",
+                    font=dict(size=22, color=PLOT_FONT_COLOR)
                 ),
                 xaxis=dict(
                     title=dict(
-                        text="Sentiment",
+                        text="Year",
+                        font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    type="category",
+                    categoryorder="array",
+                    categoryarray=year_summary["Year_Label"].tolist(),
+                    showgrid=False,
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                ),
+                yaxis=dict(
+                    title=dict(
+                        text="Total Reviews",
+                        font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    showgrid=False,
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                ),
+                plot_bgcolor=PLOT_BG_COLOR,
+                paper_bgcolor=PLOT_BG_COLOR,
+                showlegend=False
+            )
+
+            st.plotly_chart(fig_year, width="stretch")
+
+    with time_col2:
+        year_rating_df = analysis_df.dropna(subset=["Dashboard_Year", rating_col]).copy()
+
+        if not year_rating_df.empty:
+            avg_year_summary = year_rating_df.groupby("Dashboard_Year").agg(
+                Avg_Rating=(rating_col, "mean")
+            ).reset_index()
+
+            avg_year_summary["Dashboard_Year"] = avg_year_summary["Dashboard_Year"].astype(int)
+            avg_year_summary = avg_year_summary.sort_values("Dashboard_Year")
+            avg_year_summary["Year_Label"] = avg_year_summary["Dashboard_Year"].astype(str)
+
+            fig_avg_year = go.Figure()
+
+            fig_avg_year.add_trace(go.Scatter(
+                x=avg_year_summary["Year_Label"],
+                y=avg_year_summary["Avg_Rating"],
+                mode="lines+markers+text",
+                line=dict(color="#FF8A00", width=4),
+                marker=dict(size=11, color="#FF8A00"),
+                text=[f"{v:.2f}" for v in avg_year_summary["Avg_Rating"]],
+                textposition="top center",
+                textfont=dict(color=PLOT_FONT_COLOR, size=13),
+                name="Avg Rating"
+            ))
+
+            fig_avg_year.update_layout(
+                template=PLOT_TEMPLATE,
+                height=450,
+                title=dict(
+                    text="Avg Rating by Year",
+                    font=dict(size=22, color=PLOT_FONT_COLOR)
+                ),
+                font=dict(color=PLOT_FONT_COLOR),
+                xaxis=dict(
+                    title=dict(
+                        text="Year",
+                        font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    type="category",
+                    categoryorder="array",
+                    categoryarray=avg_year_summary["Year_Label"].tolist(),
+                    showgrid=False,
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                ),
+                yaxis=dict(
+                    title=dict(
+                        text="Avg Rating",
+                        font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    range=[0, 5.3],
+                    showgrid=False,
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                ),
+                plot_bgcolor=PLOT_BG_COLOR,
+                paper_bgcolor=PLOT_BG_COLOR,
+                showlegend=False
+            )
+
+            st.plotly_chart(fig_avg_year, width="stretch")
+
+    quarter_col1, quarter_col2 = st.columns(2)
+
+    with quarter_col1:
+        quarter_df = analysis_df.dropna(subset=["Dashboard_Quarter"]).copy()
+
+        if not quarter_df.empty:
+            quarter_summary = quarter_df.groupby("Dashboard_Quarter").agg(
+                Total_Reviews=("Dashboard_Quarter", "count")
+            ).reset_index()
+
+            quarter_summary["Quarter_Order"] = quarter_summary["Dashboard_Quarter"].map(
+                {"Q1": 1, "Q2": 2, "Q3": 3, "Q4": 4}
+            )
+
+            quarter_summary = quarter_summary.sort_values("Quarter_Order")
+
+            fig_quarter = px.bar(
+                quarter_summary,
+                x="Dashboard_Quarter",
+                y="Total_Reviews",
+                text=quarter_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
+                title="Total Reviews by Quarter"
+            )
+
+            fig_quarter.update_traces(
+                marker_color="#25B6C8",
+                textposition="outside",
+                textfont=dict(color=PLOT_FONT_COLOR, size=13),
+                cliponaxis=False
+            )
+
+            fig_quarter.update_layout(
+                template=PLOT_TEMPLATE,
+                height=450,
+                title=dict(
+                    text="Total Reviews by Quarter",
+                    font=dict(size=22, color=PLOT_FONT_COLOR)
+                ),
+                font=dict(color=PLOT_FONT_COLOR),
+                xaxis=dict(
+                    title=dict(
+                        text="Quarter",
                         font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
                     ),
                     showgrid=False,
@@ -970,209 +903,430 @@ if uploaded_file:
                 ),
                 yaxis=dict(
                     title=dict(
-                        text="Count",
+                        text="Total Reviews",
                         font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
                     ),
                     showgrid=False,
                     tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
                 ),
                 plot_bgcolor=PLOT_BG_COLOR,
-                paper_bgcolor=PLOT_BG_COLOR
+                paper_bgcolor=PLOT_BG_COLOR,
+                showlegend=False
             )
 
-            st.plotly_chart(fig_sent, width="stretch")
+            st.plotly_chart(fig_quarter, width="stretch")
 
-        with colB:
-            st.subheader("🌐 Language Distribution")
+    with quarter_col2:
+        rating_dist = analysis_df.dropna(subset=[rating_col]).copy()
 
-            lang_data = analysis_df[language_col].value_counts().reset_index()
-            lang_data.columns = ["Language", "Count"]
+        if not rating_dist.empty:
+            rating_summary = rating_dist.groupby(rating_col).size().reset_index(name="Total_Reviews")
+            rating_summary = rating_summary.sort_values(rating_col)
 
-            fig_lang = px.pie(
-                lang_data,
-                names="Language",
-                values="Count",
-                hole=0.5,
-                color="Language"
+            fig_rating = px.bar(
+                rating_summary,
+                x=rating_col,
+                y="Total_Reviews",
+                text=rating_summary["Total_Reviews"].apply(lambda x: f"{x:,}"),
+                title="Total Reviews by Rating"
             )
 
-            fig_lang.update_traces(
-                textinfo="percent+label",
-                textfont=dict(size=15, color=PLOT_FONT_COLOR)
+            fig_rating.update_traces(
+                marker_color="#25B6C8",
+                textposition="outside",
+                textfont=dict(color=PLOT_FONT_COLOR, size=13),
+                cliponaxis=False
             )
 
-            fig_lang.update_layout(
+            fig_rating.update_layout(
                 template=PLOT_TEMPLATE,
-                height=480,
+                height=450,
                 title=dict(
-                    text="Language Distribution",
+                    text="Total Reviews by Rating",
                     font=dict(size=22, color=PLOT_FONT_COLOR)
                 ),
                 font=dict(color=PLOT_FONT_COLOR),
-                legend=dict(
-                    title=dict(font=dict(color=PLOT_FONT_COLOR)),
-                    font=dict(size=15, color=PLOT_FONT_COLOR)
+                xaxis=dict(
+                    title=dict(
+                        text="Rating",
+                        font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    showgrid=False,
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+                ),
+                yaxis=dict(
+                    title=dict(
+                        text="Total Reviews",
+                        font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+                    ),
+                    showgrid=False,
+                    tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
                 ),
                 plot_bgcolor=PLOT_BG_COLOR,
                 paper_bgcolor=PLOT_BG_COLOR,
-                showlegend=True
+                showlegend=False
             )
 
-            st.plotly_chart(fig_lang, width="stretch")
+            st.plotly_chart(fig_rating, width="stretch")
 
-        st.markdown("---")
+    st.markdown("---")
 
-        # =========================
-        # Negative Reviews by Theme
-        # =========================
-        st.subheader("🔥 Negative Reviews by Theme")
+    # =========================
+    # Reviews & Avg Rating by Theme
+    # =========================
+    st.subheader("📊 Reviews & Avg Rating by Theme")
 
-        neg_df = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
+    theme_summary = analysis_df.groupby(theme_col).agg(
+        Total_Reviews=(theme_col, "count"),
+        Avg_Rating=(rating_col, "mean")
+    ).reset_index()
 
-        neg_theme = neg_df.groupby(theme_col).size().reset_index(name="Negative Reviews")
-        neg_theme = neg_theme.sort_values(by="Negative Reviews", ascending=False)
+    theme_summary = theme_summary.sort_values(by="Total_Reviews", ascending=False)
 
-        total_neg = len(neg_df)
+    fig_theme = go.Figure()
 
-        if total_neg > 0:
-            neg_theme["Label"] = neg_theme["Negative Reviews"].apply(
-                lambda x: f"{x:,} ({x / total_neg:.1%})"
-            )
-        else:
-            neg_theme["Label"] = "0"
+    fig_theme.add_trace(go.Bar(
+        x=theme_summary[theme_col].astype(str),
+        y=theme_summary["Total_Reviews"],
+        name="Total Reviews",
+        marker_color="#25B6C8",
+        text=theme_summary["Total_Reviews"],
+        texttemplate="%{text:,}",
+        textposition="outside",
+        textfont=dict(size=12, color=PLOT_FONT_COLOR),
+        cliponaxis=False,
+        hovertemplate="<b>%{x}</b><br>Total Reviews: %{y:,}<extra></extra>"
+    ))
 
-        colors = ["#7F1D1D"] + ["#DC2626"] * (len(neg_theme) - 1)
+    fig_theme.add_trace(go.Scatter(
+        x=theme_summary[theme_col].astype(str),
+        y=theme_summary["Avg_Rating"],
+        name="Avg Rating",
+        mode="lines+markers+text",
+        yaxis="y2",
+        line=dict(color="#FF8A00", width=4),
+        marker=dict(size=11, color="#FF8A00"),
+        text=[f"{v:.2f}" for v in theme_summary["Avg_Rating"]],
+        textposition=["bottom center"] + ["top center"] * (len(theme_summary) - 1),
+        textfont=dict(color=PLOT_FONT_COLOR, size=14),
+        hovertemplate="<b>%{x}</b><br>Avg Rating: %{y:.2f}<extra></extra>"
+    ))
 
-        fig_neg = go.Figure()
-
-        fig_neg.add_trace(go.Bar(
-            x=neg_theme["Negative Reviews"],
-            y=neg_theme[theme_col],
+    fig_theme.update_layout(
+        template=PLOT_TEMPLATE,
+        height=590,
+        title=dict(
+            text="Reviews & Avg Rating by Theme",
+            font=dict(size=PLOT_TITLE_SIZE, color=PLOT_FONT_COLOR)
+        ),
+        font=dict(color=PLOT_FONT_COLOR),
+        showlegend=True,
+        legend=dict(
             orientation="h",
-            name="Negative Reviews",
-            marker=dict(color=colors),
-            text=neg_theme["Label"],
-            textposition="outside",
-            textfont=dict(size=14, color=PLOT_FONT_COLOR),
-            cliponaxis=False,
-            hovertemplate="<b>%{y}</b><br>Negative Reviews: %{x:,}<extra></extra>"
-        ))
-
-        max_neg = neg_theme["Negative Reviews"].max() if len(neg_theme) > 0 else 1
-
-        fig_neg.update_layout(
-            template=PLOT_TEMPLATE,
-            height=530,
+            y=1.08,
+            x=0.38,
+            font=dict(size=15, color=PLOT_FONT_COLOR),
+            title=dict(font=dict(color=PLOT_FONT_COLOR))
+        ),
+        xaxis=dict(
             title=dict(
-                text="Negative Reviews by Theme",
-                font=dict(size=22, color=PLOT_FONT_COLOR)
+                text="Theme",
+                font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
             ),
-            font=dict(color=PLOT_FONT_COLOR),
-            xaxis=dict(
-                title=dict(
-                    text="Negative Reviews",
-                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                ),
-                showgrid=False,
-                range=[0, max_neg * 1.18],
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+            tickangle=-25,
+            showgrid=False,
+            tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+        ),
+        yaxis=dict(
+            title=dict(
+                text="Total Reviews",
+                font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
             ),
-            yaxis=dict(
-                title=dict(
-                    text="Theme",
-                    font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
-                ),
-                categoryorder="total ascending",
-                showgrid=False,
-                tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+            type="linear",
+            showgrid=False,
+            zeroline=False,
+            tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+        ),
+        yaxis2=dict(
+            title=dict(
+                text="Avg Rating",
+                font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
             ),
-            plot_bgcolor=PLOT_BG_COLOR,
-            paper_bgcolor=PLOT_BG_COLOR,
-            margin=dict(l=100, r=160, t=70, b=50),
-            showlegend=False
+            overlaying="y",
+            side="right",
+            range=[0, 5.3],
+            showgrid=False,
+            zeroline=False,
+            tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+        ),
+        plot_bgcolor=PLOT_BG_COLOR,
+        paper_bgcolor=PLOT_BG_COLOR,
+        margin=dict(t=105, b=125, l=80, r=80)
+    )
+
+    st.plotly_chart(fig_theme, width="stretch")
+
+    st.markdown("---")
+
+    # =========================
+    # Sentiment & Language
+    # =========================
+    colA, colB = st.columns(2)
+
+    with colA:
+        st.subheader("😊 Sentiment Distribution")
+
+        sentiment_data = analysis_df["Sentiment_Clean"].value_counts().reset_index()
+        sentiment_data.columns = ["Sentiment", "Count"]
+
+        fig_sent = px.bar(
+            sentiment_data,
+            x="Sentiment",
+            y="Count",
+            color="Sentiment",
+            text=sentiment_data["Count"].apply(lambda x: f"{x:,}"),
+            color_discrete_map={
+                "Positive": "#10B981",
+                "Negative": "#EF4444",
+                "Neutral": "#3B82F6"
+            }
         )
 
-        st.plotly_chart(fig_neg, width="stretch")
-
-        st.markdown("---")
-
-        # =========================
-        # Top Subthemes
-        # =========================
-        st.subheader("🧩 Top Subthemes")
-
-        sub_data = analysis_df[subtheme_col].value_counts().head(20).reset_index()
-        sub_data.columns = ["Subtheme", "Count"]
-
-        fig_sub = px.bar(
-            sub_data,
-            x="Count",
-            y="Subtheme",
-            orientation="h",
-            text=sub_data["Count"].apply(lambda x: f"{x:,}"),
-            color="Count",
-            color_continuous_scale="Teal"
-        )
-
-        fig_sub.update_traces(
+        fig_sent.update_traces(
             textposition="outside",
             textfont=dict(size=14, color=PLOT_FONT_COLOR),
             cliponaxis=False
         )
 
-        max_sub = sub_data["Count"].max() if len(sub_data) > 0 else 1
-
-        fig_sub.update_layout(
+        fig_sent.update_layout(
             template=PLOT_TEMPLATE,
-            height=670,
+            height=480,
+            bargap=0.3,
             title=dict(
-                text="Top Subthemes",
+                text="Sentiment Distribution",
                 font=dict(size=22, color=PLOT_FONT_COLOR)
             ),
             font=dict(color=PLOT_FONT_COLOR),
+            legend=dict(
+                title=dict(
+                    text="Sentiment",
+                    font=dict(size=14, color=PLOT_FONT_COLOR)
+                ),
+                font=dict(size=14, color=PLOT_FONT_COLOR)
+            ),
             xaxis=dict(
                 title=dict(
-                    text="Count",
+                    text="Sentiment",
                     font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
                 ),
                 showgrid=False,
-                range=[0, max_sub * 1.18],
                 tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
             ),
             yaxis=dict(
                 title=dict(
-                    text="Subtheme",
+                    text="Count",
                     font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
                 ),
                 showgrid=False,
-                categoryorder="total ascending",
                 tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
             ),
-            coloraxis_colorbar=dict(
-                title=dict(
-                    text="Count",
-                    font=dict(color=PLOT_FONT_COLOR)
-                ),
-                tickfont=dict(color=PLOT_FONT_COLOR)
+            plot_bgcolor=PLOT_BG_COLOR,
+            paper_bgcolor=PLOT_BG_COLOR
+        )
+
+        st.plotly_chart(fig_sent, width="stretch")
+
+    with colB:
+        st.subheader("🌐 Language Distribution")
+
+        lang_data = analysis_df[language_col].value_counts().reset_index()
+        lang_data.columns = ["Language", "Count"]
+
+        fig_lang = px.pie(
+            lang_data,
+            names="Language",
+            values="Count",
+            hole=0.5,
+            color="Language"
+        )
+
+        fig_lang.update_traces(
+            textinfo="percent+label",
+            textfont=dict(size=15, color=PLOT_FONT_COLOR)
+        )
+
+        fig_lang.update_layout(
+            template=PLOT_TEMPLATE,
+            height=480,
+            title=dict(
+                text="Language Distribution",
+                font=dict(size=22, color=PLOT_FONT_COLOR)
+            ),
+            font=dict(color=PLOT_FONT_COLOR),
+            legend=dict(
+                title=dict(font=dict(color=PLOT_FONT_COLOR)),
+                font=dict(size=15, color=PLOT_FONT_COLOR)
             ),
             plot_bgcolor=PLOT_BG_COLOR,
             paper_bgcolor=PLOT_BG_COLOR,
-            margin=dict(l=100, r=170, t=70, b=50)
+            showlegend=True
         )
 
-        st.plotly_chart(fig_sub, width="stretch")
+        st.plotly_chart(fig_lang, width="stretch")
 
-        st.markdown("---")
+    st.markdown("---")
 
-        # =========================
-        # Data Sample
-        # =========================
-        st.subheader("📄 Data Sample")
-        st.caption("Showing a sample of 20 anonymized rows only for faster performance.")
+    # =========================
+    # Negative Reviews by Theme
+    # =========================
+    st.subheader("🔥 Negative Reviews by Theme")
 
-        sample_df = analysis_df.head(20).copy()
-        sample_df.insert(0, "Review_ID", range(1, len(sample_df) + 1))
-        sample_df = remove_private_columns(sample_df)
-        sample_df = sample_df.reset_index(drop=True)
+    neg_df = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"]
 
-        st.dataframe(sample_df, width="stretch", hide_index=True)
+    neg_theme = neg_df.groupby(theme_col).size().reset_index(name="Negative Reviews")
+    neg_theme = neg_theme.sort_values(by="Negative Reviews", ascending=False)
+
+    total_neg = len(neg_df)
+
+    if total_neg > 0:
+        neg_theme["Label"] = neg_theme["Negative Reviews"].apply(
+            lambda x: f"{x:,} ({x / total_neg:.1%})"
+        )
+    else:
+        neg_theme["Label"] = "0"
+
+    colors = ["#7F1D1D"] + ["#DC2626"] * (len(neg_theme) - 1)
+
+    fig_neg = go.Figure()
+
+    fig_neg.add_trace(go.Bar(
+        x=neg_theme["Negative Reviews"],
+        y=neg_theme[theme_col],
+        orientation="h",
+        name="Negative Reviews",
+        marker=dict(color=colors),
+        text=neg_theme["Label"],
+        textposition="outside",
+        textfont=dict(size=14, color=PLOT_FONT_COLOR),
+        cliponaxis=False,
+        hovertemplate="<b>%{y}</b><br>Negative Reviews: %{x:,}<extra></extra>"
+    ))
+
+    max_neg = neg_theme["Negative Reviews"].max() if len(neg_theme) > 0 else 1
+
+    fig_neg.update_layout(
+        template=PLOT_TEMPLATE,
+        height=530,
+        title=dict(
+            text="Negative Reviews by Theme",
+            font=dict(size=22, color=PLOT_FONT_COLOR)
+        ),
+        font=dict(color=PLOT_FONT_COLOR),
+        xaxis=dict(
+            title=dict(
+                text="Negative Reviews",
+                font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+            ),
+            showgrid=False,
+            range=[0, max_neg * 1.18],
+            tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+        ),
+        yaxis=dict(
+            title=dict(
+                text="Theme",
+                font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+            ),
+            categoryorder="total ascending",
+            showgrid=False,
+            tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+        ),
+        plot_bgcolor=PLOT_BG_COLOR,
+        paper_bgcolor=PLOT_BG_COLOR,
+        margin=dict(l=100, r=160, t=70, b=50),
+        showlegend=False
+    )
+
+    st.plotly_chart(fig_neg, width="stretch")
+
+    st.markdown("---")
+
+    # =========================
+    # Top Subthemes
+    # =========================
+    st.subheader("🧩 Top Subthemes")
+
+    sub_data = analysis_df[subtheme_col].value_counts().head(20).reset_index()
+    sub_data.columns = ["Subtheme", "Count"]
+
+    fig_sub = px.bar(
+        sub_data,
+        x="Count",
+        y="Subtheme",
+        orientation="h",
+        text=sub_data["Count"].apply(lambda x: f"{x:,}"),
+        color="Count",
+        color_continuous_scale="Teal"
+    )
+
+    fig_sub.update_traces(
+        textposition="outside",
+        textfont=dict(size=14, color=PLOT_FONT_COLOR),
+        cliponaxis=False
+    )
+
+    max_sub = sub_data["Count"].max() if len(sub_data) > 0 else 1
+
+    fig_sub.update_layout(
+        template=PLOT_TEMPLATE,
+        height=670,
+        title=dict(
+            text="Top Subthemes",
+            font=dict(size=22, color=PLOT_FONT_COLOR)
+        ),
+        font=dict(color=PLOT_FONT_COLOR),
+        xaxis=dict(
+            title=dict(
+                text="Count",
+                font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+            ),
+            showgrid=False,
+            range=[0, max_sub * 1.18],
+            tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+        ),
+        yaxis=dict(
+            title=dict(
+                text="Subtheme",
+                font=dict(size=PLOT_AXIS_TITLE_SIZE, color=PLOT_FONT_COLOR)
+            ),
+            showgrid=False,
+            categoryorder="total ascending",
+            tickfont=dict(size=PLOT_TICK_SIZE, color=PLOT_FONT_COLOR)
+        ),
+        coloraxis_colorbar=dict(
+            title=dict(
+                text="Count",
+                font=dict(color=PLOT_FONT_COLOR)
+            ),
+            tickfont=dict(color=PLOT_FONT_COLOR)
+        ),
+        plot_bgcolor=PLOT_BG_COLOR,
+        paper_bgcolor=PLOT_BG_COLOR,
+        margin=dict(l=100, r=170, t=70, b=50)
+    )
+
+    st.plotly_chart(fig_sub, width="stretch")
+
+    st.markdown("---")
+
+    # =========================
+    # Data Sample
+    # =========================
+    st.subheader("📄 Data Sample")
+    st.caption("Showing a sample of 20 anonymized rows only for faster performance.")
+
+    sample_df = analysis_df.head(20).copy()
+    sample_df.insert(0, "Review_ID", range(1, len(sample_df) + 1))
+    sample_df = remove_private_columns(sample_df)
+    sample_df = sample_df.reset_index(drop=True)
+
+    st.dataframe(sample_df, width="stretch", hide_index=True)
