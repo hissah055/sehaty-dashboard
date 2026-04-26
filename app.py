@@ -258,7 +258,7 @@ if uploaded_file:
     filter_df["Sentiment_Clean"] = filter_df[sentiment_col].apply(clean_sentiment)
 
     # =========================
-    # Top Dashboard Filters + Crystal Arrow Style
+    # Dashboard Filter Style
     # =========================
     filter_style_html = """
 <style>
@@ -274,89 +274,33 @@ if uploaded_file:
     box-shadow: 0 6px 18px rgba(0,0,0,0.18);
 }
 
-/* صندوق الفلتر */
-.filter-card {
-    position: relative;
-    background: linear-gradient(145deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
-    border: 1px solid rgba(255,255,255,0.16);
-    border-radius: 18px;
-    padding: 12px 14px 10px 14px;
-    margin-bottom: 14px;
-    box-shadow: 0 8px 22px rgba(0,0,0,0.16);
-    overflow: hidden;
-}
-
-/* لمعة كريستال ناعمة */
-.filter-card::before {
-    content: "";
-    position: absolute;
-    top: -45%;
-    left: -35%;
-    width: 42%;
-    height: 190%;
-    background: linear-gradient(
-        120deg,
-        rgba(255,255,255,0.00) 0%,
-        rgba(255,255,255,0.10) 35%,
-        rgba(255,255,255,0.32) 50%,
-        rgba(255,255,255,0.08) 65%,
-        rgba(255,255,255,0.00) 100%
-    );
-    transform: rotate(18deg);
-    animation: crystalShine 4s infinite ease-in-out;
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* سهم فضي كريستال */
-.filter-card::after {
-    content: "❯";
-    position: absolute;
-    right: 15px;
-    top: 18px;
-    font-size: 19px;
-    font-weight: bold;
-    color: #E5E7EB;
-    text-shadow:
-        0 0 4px rgba(255,255,255,0.65),
-        0 0 10px rgba(220,230,240,0.45);
-    animation: arrowFloat 2s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 3;
-}
-
-/* حركة اللمعة */
-@keyframes crystalShine {
-    0%   { left: -35%; opacity: 0.12; }
-    50%  { left: 45%; opacity: 0.55; }
-    100% { left: 120%; opacity: 0.08; }
-}
-
-/* حركة السهم */
-@keyframes arrowFloat {
-    0%   { transform: translateY(0px); opacity: 0.75; }
-    50%  { transform: translateY(-2px); opacity: 1; }
-    100% { transform: translateY(0px); opacity: 0.75; }
-}
-
-/* تنسيق الليبل */
 label p {
     font-weight: 800 !important;
     color: #F8FAFC !important;
 }
 
-/* تحسين شكل multiselect */
+/* صندوق الفلتر الحقيقي */
 div[data-baseweb="select"] > div {
-    background-color: rgba(255,255,255,0.07) !important;
-    border: 1px solid rgba(255,255,255,0.18) !important;
-    border-radius: 14px !important;
+    background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04)) !important;
+    border: 1px solid rgba(255,255,255,0.22) !important;
+    border-radius: 16px !important;
     color: white !important;
-    box-shadow: inset 0 0 8px rgba(255,255,255,0.05);
+    min-height: 52px !important;
+    box-shadow:
+        inset 0 0 8px rgba(255,255,255,0.06),
+        0 8px 22px rgba(0,0,0,0.16) !important;
 }
 
 /* النص داخل الفلاتر */
 div[data-baseweb="select"] * {
     color: #FFFFFF !important;
+}
+
+/* السهم الداخلي فضي كريستال */
+div[data-baseweb="select"] svg {
+    fill: #E5E7EB !important;
+    color: #E5E7EB !important;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.55));
 }
 
 /* تغيير لون الخيارات المختارة بدل الأحمر */
@@ -377,26 +321,14 @@ div[data-baseweb="tag"] svg {
     fill: #E5E7EB !important;
     color: #E5E7EB !important;
 }
-
-/* السهم الداخلي الأصلي نخليه فضي */
-div[data-baseweb="select"] svg {
-    fill: #E5E7EB !important;
-    color: #E5E7EB !important;
-    filter: drop-shadow(0 0 4px rgba(255,255,255,0.45));
-}
-
-/* الكروت عند المرور عليها */
-.filter-card:hover {
-    transform: translateY(-2px);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.22);
-    border-color: rgba(255,255,255,0.30);
-}
 </style>
 <div class="filter-title">🔎 Dashboard Filters</div>
 """
     st.markdown(filter_style_html, unsafe_allow_html=True)
 
+    # =========================
+    # Filter Options
+    # =========================
     year_options = get_sorted_unique(filter_df["Dashboard_Year"])
     year_options = [int(y) for y in year_options if pd.notna(y)]
 
@@ -424,13 +356,74 @@ div[data-baseweb="select"] svg {
         if s in filter_df["Sentiment_Clean"].dropna().unique().tolist()
     ]
 
-    theme_options = get_sorted_unique(filter_df[theme_col])
-    subtheme_options = get_sorted_unique(filter_df[subtheme_col])
+    THEME_ORDER = [
+        "Technical Performance",
+        "Content & Services",
+        "User Experience & Sentiment",
+        "Suggestions & UI Design",
+        "Security & Support"
+    ]
 
+    SUBTHEME_ORDER = [
+        "App Speed",
+        "Loading Time",
+        "Crashes/Freezes",
+        "Errors/Bugs",
+        "Connectivity/Network",
+        "Stability",
+        "General",
+        "General_Technical",
+
+        "Appointment Booking",
+        "Results Delivery",
+        "Reports/Documents",
+        "Prescriptions",
+        "Records/Vaccination",
+        "Teleconsultation",
+        "General_Content",
+
+        "Ease of Use",
+        "Navigation",
+        "UI Clarity",
+        "Onboarding",
+        "Overall Satisfaction",
+        "Accessibility Help & Guidance",
+        "General_UX",
+
+        "Feature Request – Dark Mode",
+        "Notifications & Reminders",
+        "Layout Improvements",
+        "Customization",
+        "Language Options",
+        "Accessibility Enhancements",
+        "General_Suggestions",
+
+        "Login/OTP",
+        "Password Reset",
+        "Account Verification",
+        "Privacy/Permissions",
+        "Support Responsiveness",
+        "Account Access Issues",
+        "General_Security"
+    ]
+
+    existing_themes = filter_df[theme_col].dropna().unique().tolist()
+    existing_subthemes = filter_df[subtheme_col].dropna().unique().tolist()
+
+    theme_options = [x for x in THEME_ORDER if x in existing_themes]
+    extra_themes = [x for x in get_sorted_unique(filter_df[theme_col]) if x not in theme_options and x != "Unknown"]
+    theme_options = theme_options + extra_themes
+
+    subtheme_options = [x for x in SUBTHEME_ORDER if x in existing_subthemes]
+    extra_subthemes = [x for x in get_sorted_unique(filter_df[subtheme_col]) if x not in subtheme_options and x != "Unknown"]
+    subtheme_options = subtheme_options + extra_subthemes
+
+    # =========================
+    # Top Filters
+    # =========================
     f1, f2, f3, f4 = st.columns(4)
 
     with f1:
-        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
         selected_years = st.multiselect(
             "Review Year",
             options=year_options,
@@ -438,10 +431,8 @@ div[data-baseweb="select"] svg {
             placeholder="All years",
             key="filter_years"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with f2:
-        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
         selected_quarters = st.multiselect(
             "Quarter",
             options=quarter_options,
@@ -449,10 +440,8 @@ div[data-baseweb="select"] svg {
             placeholder="All quarters",
             key="filter_quarters"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with f3:
-        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
         selected_months = st.multiselect(
             "Month",
             options=month_options,
@@ -460,10 +449,8 @@ div[data-baseweb="select"] svg {
             placeholder="All months",
             key="filter_months"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with f4:
-        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
         selected_ratings = st.multiselect(
             "Rating",
             options=rating_options,
@@ -471,12 +458,10 @@ div[data-baseweb="select"] svg {
             placeholder="All ratings",
             key="filter_ratings"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
     f5, f6, f7, f8 = st.columns([1.2, 1.2, 1.6, 1.6])
 
     with f5:
-        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
         selected_languages = st.multiselect(
             "Language",
             options=language_options,
@@ -484,10 +469,8 @@ div[data-baseweb="select"] svg {
             placeholder="All languages",
             key="filter_languages"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with f6:
-        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
         selected_sentiments = st.multiselect(
             "Sentiment",
             options=sentiment_options,
@@ -495,10 +478,8 @@ div[data-baseweb="select"] svg {
             placeholder="All sentiments",
             key="filter_sentiments"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with f7:
-        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
         selected_themes = st.multiselect(
             "Theme",
             options=theme_options,
@@ -506,10 +487,8 @@ div[data-baseweb="select"] svg {
             placeholder="All themes",
             key="filter_themes"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with f8:
-        st.markdown('<div class="filter-card">', unsafe_allow_html=True)
         selected_subthemes = st.multiselect(
             "Subtheme",
             options=subtheme_options,
@@ -517,7 +496,6 @@ div[data-baseweb="select"] svg {
             placeholder="All subthemes",
             key="filter_subthemes"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
     clear_col, info_col = st.columns([1, 5])
 
