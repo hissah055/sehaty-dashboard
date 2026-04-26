@@ -16,7 +16,7 @@ st.set_page_config(
 # =========================
 PLOT_TEMPLATE = "plotly_white"
 PLOT_FONT_COLOR = "#000000"
-PLOT_BG_COLOR = "#EAF7EE"   # Soft green chart background only
+PLOT_BG_COLOR = "#DDF3E4"   # Soft green chart background
 PLOT_AXIS_TITLE_SIZE = 20
 PLOT_TICK_SIZE = 15
 PLOT_TITLE_SIZE = 24
