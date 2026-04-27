@@ -471,11 +471,11 @@ def clean_sentiment(value):
 
 
 
-    if value in ["positive", "pos", "إيجابي", "ايجابي"]:
+    if value in ["positive", "pos", "\u0625\u064a\u062c\u0627\u0628\u064a", "\u0627\u064a\u062c\u0627\u0628\u064a"]:
         return "Positive"
-    elif value in ["negative", "neg", "سلبي"]:
+    elif value in ["negative", "neg", "\u0633\u0644\u0628\u064a"]:
         return "Negative"
-    elif value in ["neutral", "neu", "محايد"]:
+    elif value in ["neutral", "neu", "\u0645\u062d\u0627\u064a\u062f"]:
         return "Neutral"
     else:
         return "Unknown"
@@ -685,6 +685,189 @@ header_html = f"""
 
 
 st.markdown(header_html, unsafe_allow_html=True)
+
+# =========================
+# Welcome Hero Image Section
+# =========================
+def get_welcome_image_base64():
+    image_candidates = [
+        "saudi_team_dashboard.png",
+        "saudi_team_dashboard.jpg",
+        "saudi_team_dashboard.jpeg",
+        "saudi_team_dashboard.png.png",
+        "saudi_team_dashboard.png(1).png",
+        "saudi_team_dashboard.png(2).png",
+    ]
+
+    for image_name in image_candidates:
+        image_path = Path(image_name)
+        if image_path.exists():
+            return base64.b64encode(image_path.read_bytes()).decode()
+
+    return None
+
+
+welcome_image_base64 = get_welcome_image_base64()
+
+if welcome_image_base64:
+    welcome_hero_html = f"""
+    <style>
+    .welcome-hero {{
+        position: relative;
+        min-height: 430px;
+        border-radius: 28px;
+        overflow: hidden;
+        margin: 26px 0 28px 0;
+        background-image:
+            linear-gradient(90deg, rgba(15,118,110,0.88) 0%, rgba(8,145,178,0.58) 42%, rgba(0,0,0,0.10) 100%),
+            url('data:image/png;base64,{welcome_image_base64}');
+        background-size: cover;
+        background-position: center;
+        box-shadow: 0 18px 45px rgba(15, 118, 110, 0.26);
+        animation: heroFadeIn 0.9s ease-out both;
+    }}
+
+    .welcome-hero::after {{
+        content: "";
+        position: absolute;
+        top: -60%;
+        left: -35%;
+        width: 28%;
+        height: 220%;
+        background: linear-gradient(
+            120deg,
+            rgba(255,255,255,0.00) 0%,
+            rgba(255,255,255,0.12) 35%,
+            rgba(255,255,255,0.42) 50%,
+            rgba(255,255,255,0.12) 65%,
+            rgba(255,255,255,0.00) 100%
+        );
+        transform: rotate(22deg);
+        animation: heroShine 5.5s infinite ease-in-out;
+        pointer-events: none;
+    }}
+
+    .welcome-content {{
+        position: absolute;
+        left: 52px;
+        top: 50%;
+        transform: translateY(-50%);
+        max-width: 660px;
+        color: white;
+        z-index: 2;
+        animation: contentSlideUp 1s ease-out both;
+    }}
+
+    .welcome-badge {{
+        display: inline-block;
+        padding: 9px 16px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.18);
+        border: 1px solid rgba(255,255,255,0.32);
+        backdrop-filter: blur(6px);
+        font-size: 15px;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }}
+
+    .welcome-title {{
+        font-size: 48px;
+        font-weight: 950;
+        margin: 0 0 14px 0;
+        line-height: 1.08;
+        text-shadow: 0 4px 18px rgba(0,0,0,0.28);
+    }}
+
+    .welcome-subtitle {{
+        font-size: 23px;
+        font-weight: 750;
+        line-height: 1.45;
+        margin: 0;
+        text-shadow: 0 3px 12px rgba(0,0,0,0.24);
+    }}
+
+    .welcome-mini {{
+        margin-top: 18px;
+        font-size: 16px;
+        font-weight: 700;
+        opacity: 0.94;
+    }}
+
+    @keyframes heroFadeIn {{
+        from {{ opacity: 0; transform: translateY(18px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }}
+
+    @keyframes contentSlideUp {{
+        from {{ opacity: 0; transform: translateY(-42%); }}
+        to {{ opacity: 1; transform: translateY(-50%); }}
+    }}
+
+    @keyframes heroShine {{
+        0% {{ left: -45%; opacity: 0; }}
+        18% {{ opacity: 0.9; }}
+        42% {{ left: 125%; opacity: 0; }}
+        100% {{ left: 125%; opacity: 0; }}
+    }}
+
+    @media (max-width: 900px) {{
+        .welcome-hero {{ min-height: 360px; }}
+        .welcome-content {{ left: 26px; right: 24px; max-width: none; }}
+        .welcome-title {{ font-size: 36px; }}
+        .welcome-subtitle {{ font-size: 18px; }}
+    }}
+    </style>
+
+    <div class="welcome-hero">
+        <div class="welcome-content">
+            <div class="welcome-badge">AI-Powered Review Intelligence</div>
+            <h2 class="welcome-title">Welcome!</h2>
+            <p class="welcome-subtitle">Start exploring insights from Sehhaty reviews in seconds.</p>
+            <div class="welcome-mini">Upload your file, choose filters, and discover actionable healthcare insights.</div>
+        </div>
+    </div>
+    """
+    st.markdown(welcome_hero_html, unsafe_allow_html=True)
+else:
+    st.markdown(
+        """
+        <style>
+        .welcome-fallback {
+            background: linear-gradient(135deg, #0891B2, #0F766E);
+            color: white;
+            padding: 38px 28px;
+            border-radius: 24px;
+            margin: 24px 0 28px 0;
+            text-align: center;
+            box-shadow: 0 16px 38px rgba(15, 118, 110, 0.24);
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-fallback::after {
+            content: "";
+            position: absolute;
+            top: -60%;
+            left: -40%;
+            width: 30%;
+            height: 220%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.45), transparent);
+            transform: rotate(22deg);
+            animation: fallbackShine 5s infinite ease-in-out;
+        }
+        @keyframes fallbackShine {
+            0% { left: -45%; opacity: 0; }
+            35% { left: 125%; opacity: 0.8; }
+            100% { left: 125%; opacity: 0; }
+        }
+        </style>
+        <div class="welcome-fallback">
+            <h2 style="font-size:42px; font-weight:950; margin:0 0 12px 0;">Welcome!</h2>
+            <p style="font-size:22px; font-weight:750; margin:0;">Start exploring insights from Sehhaty reviews in seconds.</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 
 
@@ -1039,13 +1222,13 @@ if uploaded_file:
     # =========================
     st.markdown("---")
     st.subheader("🔎 Search Inside Reviews")
-    st.caption("Type any keyword to search within the filtered reviews, such as login, appointment, error, موعد, دخول.")
+    st.caption("Type any keyword to search within the filtered reviews, such as login, appointment, and error.")
 
 
 
     search_keyword = st.text_input(
         "Search keyword",
-        placeholder="Example: login, error, appointment, موعد",
+        placeholder="Example: login, error, appointment",
         key="review_search_keyword"
     )
 
@@ -1497,6 +1680,128 @@ if uploaded_file:
 <div class="insight-grid"><div class="insight-card"><span class="insight-icon">📅</span><div class="insight-title">Most Active Year</div><div class="insight-value">{top_year_text}</div></div><div class="insight-card"><span class="insight-icon">⭐</span><div class="insight-title">Best Avg Rating Year</div><div class="insight-value">{best_year_text}</div></div><div class="insight-card"><span class="insight-icon">🏆</span><div class="insight-title">Top Theme</div><div class="insight-value">{top_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🔥</span><div class="insight-title">Most Negative Theme</div><div class="insight-value">{negative_theme_text}</div></div><div class="insight-card"><span class="insight-icon">🧩</span><div class="insight-title">Top Subtheme</div><div class="insight-value">{top_subtheme_text}</div></div><div class="insight-card"><span class="insight-icon">📉</span><div class="insight-title">Negative Reviews Rate</div><div class="insight-value">{negative_rate_text}</div></div></div>
 """
     st.markdown(insights_html, unsafe_allow_html=True)
+
+
+
+    # =========================
+    # WOW Section: User Satisfaction + Review Storytelling + Top Keywords
+    # =========================
+    st.markdown("---")
+    st.subheader("🤖 AI-Style Insights & User Voice")
+
+    # Use the cleaned text column whenever it exists
+    clean_text_col = "Content_Clean" if "Content_Clean" in analysis_df.columns else text_col
+
+    satisfaction_level = max(0, min(100, int(round(positive_rate))))
+    st.markdown("### 😊 User Satisfaction Level")
+    st.progress(satisfaction_level)
+    st.caption(f"Positive review rate: {positive_rate:.1f}% | Negative review rate: {negative_rate:.1f}%")
+
+    # Dynamic insight sentence
+    if positive_rate >= 70 and negative_rate < 30:
+        smart_message = "Overall feedback is strongly positive, but the negative comments should still be reviewed to identify specific improvement opportunities."
+    elif negative_rate >= 30:
+        smart_message = "Negative feedback is relatively high, so priority should be given to the most frequent negative themes and subthemes."
+    else:
+        smart_message = "The feedback pattern is balanced, with opportunities to improve user experience by focusing on repeated themes and low-rating reviews."
+
+    st.info(f"💡 Smart interpretation: {smart_message}")
+
+    voice_col1, voice_col2 = st.columns(2)
+
+    positive_reviews_for_voice = analysis_df[
+        (analysis_df["Sentiment_Clean"] == "Positive") &
+        (analysis_df[clean_text_col].astype(str).str.strip() != "")
+    ].copy()
+
+    negative_reviews_for_voice = analysis_df[
+        (analysis_df["Sentiment_Clean"] == "Negative") &
+        (analysis_df[clean_text_col].astype(str).str.strip() != "")
+    ].copy()
+
+    with voice_col1:
+        st.markdown("### 🌟 Example Positive Review")
+        if not positive_reviews_for_voice.empty:
+            st.success(str(positive_reviews_for_voice.iloc[0][clean_text_col]))
+        else:
+            st.success("No positive review text available for the selected filters.")
+
+    with voice_col2:
+        st.markdown("### ⚠️ Example Negative Review")
+        if not negative_reviews_for_voice.empty:
+            st.error(str(negative_reviews_for_voice.iloc[0][clean_text_col]))
+        else:
+            st.error("No negative review text available for the selected filters.")
+
+    # Top keyword and phrases based on cleaned content
+    st.markdown("### 🔑 Top Keyword & Key Phrases from Filtered Reviews")
+    try:
+        from collections import Counter
+        import html
+        import re
+
+        stop_words = set([
+            "the", "and", "for", "with", "this", "that", "you", "your", "app", "application",
+            "good", "very", "nice",
+            "\u0645\u0646", "\u0641\u064a", "\u0639\u0644\u0649", "\u0627\u0644\u0649", "\u0625\u0644\u0649",
+            "\u0639\u0646", "\u0645\u0639", "\u0647\u0630\u0627", "\u0647\u0630\u0647", "\u0627\u0646\u0647",
+            "\u0623\u0646", "\u0625\u0646", "\u0644\u0627", "\u0645\u0627", "\u062a\u0645",
+            "\u0643\u0644", "\u0644\u0643\u0645", "\u0634\u0643\u0631\u0627", "\u0634\u0643\u0631\u0627\u064b"
+        ])
+
+        one_word_items = []
+        two_word_phrases = []
+        three_word_phrases = []
+
+        for sentence in analysis_df[clean_text_col].dropna().astype(str).tolist():
+            words = re.findall(r"[\w\u0600-\u06FF]+", sentence.lower())
+            words = [w for w in words if len(w) > 2 and w not in stop_words and not w.isdigit()]
+
+            one_word_items.extend(words)
+
+            for i in range(len(words) - 1):
+                two_word_phrases.append(words[i] + " " + words[i + 1])
+
+            for i in range(len(words) - 2):
+                three_word_phrases.append(words[i] + " " + words[i + 1] + " " + words[i + 2])
+
+        top_keyword = Counter(one_word_items).most_common(1)
+        top_two_word_phrase = Counter(two_word_phrases).most_common(1)
+        top_three_word_phrase = Counter(three_word_phrases).most_common(1)
+
+        cards = []
+        if top_keyword:
+            cards.append(("Keyword", top_keyword[0][0], top_keyword[0][1]))
+        if top_two_word_phrase:
+            cards.append(("2-Word Phrase", top_two_word_phrase[0][0], top_two_word_phrase[0][1]))
+        if top_three_word_phrase:
+            cards.append(("3-Word Phrase", top_three_word_phrase[0][0], top_three_word_phrase[0][1]))
+
+        if cards:
+            phrase_cols = st.columns(3)
+            for i, (label, phrase, count) in enumerate(cards):
+                safe_phrase = html.escape(str(phrase))
+                with phrase_cols[i]:
+                    phrase_card_html = f"""
+                    <div style="
+                        background: linear-gradient(135deg, #0891B2, #0F766E);
+                        color: white;
+                        padding: 28px 20px;
+                        border-radius: 20px;
+                        text-align: center;
+                        box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+                        min-height: 170px;
+                    ">
+                        <div style="font-size:18px; font-weight:800; opacity:0.95;">{label}</div>
+                        <div style="font-size:30px; font-weight:900; margin-top:14px; word-break:break-word; line-height:1.35;">{safe_phrase}</div>
+                        <div style="font-size:22px; font-weight:750; margin-top:10px;">{count:,}</div>
+                    </div>
+                    """
+                    st.markdown(phrase_card_html, unsafe_allow_html=True)
+        else:
+            st.caption("No keyword or key phrase is available for the selected filters.")
+    except Exception as e:
+        st.caption(f"Top keyword and key phrases could not be generated: {e}")
 
 
 
@@ -2333,6 +2638,60 @@ if uploaded_file:
 
 
 
+    # =========================
+    # Final Table Column Cleaning + Order
+    # =========================
+    # This keeps the cleaned review text column Content_Clean, not the original Content.
+    final_column_rename = {
+        "⭐Rating": "Rating",
+        "📝Content": "Content",
+        "💬DeveloperReply": "DeveloperReply",
+        "📆Review_Year": "Review_Year",
+        "📅Review_Month": "Review_Month",
+        "📅Review_Day": "Review_Day",
+        "⏰Review_Hour_12": "Review_Hour_12",
+        "🌓Review_AM_PM": "Review_AM_PM",
+        "🕰️Review_Period": "Review_Period",
+        "🔢Comment_Length": "Comment_Length",
+        "🧹Content_Clean": "Content_Clean",
+        "🎯 Theme": "Theme",
+        "🧩 Subtheme": "Subtheme",
+        "😊 Sentiment": "Sentiment",
+        "🌐 Language": "Language",
+    }
+
+    full_filtered_df = full_filtered_df.rename(columns=final_column_rename)
+
+    # ✅ Add comment length from cleaned content if it is not already available
+    if "Comment_Length" not in full_filtered_df.columns and "Content_Clean" in full_filtered_df.columns:
+        full_filtered_df["Comment_Length"] = full_filtered_df["Content_Clean"].astype(str).str.len()
+
+    preferred_order = [
+        "Review_ID",
+        "Rating",
+        "Content_Clean",
+        "DeveloperReply",
+        "Language",
+        "Theme",
+        "Subtheme",
+        "Sentiment",
+        "Dashboard_Quarter",
+        "Review_Year",
+        "Review_Month",
+        "Review_Day",
+        "Review_Hour_12",
+        "Review_AM_PM",
+        "Review_Period",
+        "Comment_Length",
+    ]
+
+    # Show only the required columns and remove any extra columns, such as:
+    # Notes, Theme_GT, Subtheme_GT, Sentiment_GT, Dashboard_Year, Dashboard_Month, Sentiment_Clean, Content
+    existing_cols = [col for col in preferred_order if col in full_filtered_df.columns]
+    full_filtered_df = full_filtered_df[existing_cols]
+
+
+
     st.dataframe(full_filtered_df, width="stretch", hide_index=True)
 
 
@@ -2346,5 +2705,116 @@ if uploaded_file:
         data=excel_file,
         file_name="sehhaty_filtered_reviews.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        use_container_width=True
+    )
+
+    # =========================
+    # Extra PDF Download Button
+    # =========================
+    st.markdown("""
+    <style>
+    div[data-testid="stDownloadButton"] > button {
+        position: relative !important;
+        overflow: hidden !important;
+        background: linear-gradient(135deg, #0891B2, #0F766E) !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 16px !important;
+        min-height: 56px !important;
+        font-size: 17px !important;
+        font-weight: 850 !important;
+        box-shadow: 0 12px 28px rgba(15,118,110,0.28) !important;
+        transition: all 0.25s ease !important;
+    }
+    div[data-testid="stDownloadButton"] > button:hover {
+        transform: translateY(-3px) !important;
+        filter: brightness(1.08) !important;
+        box-shadow: 0 16px 34px rgba(15,118,110,0.38) !important;
+    }
+    div[data-testid="stDownloadButton"] > button::after {
+        content: "";
+        position: absolute;
+        top: -70%;
+        left: -60%;
+        width: 42%;
+        height: 240%;
+        background: linear-gradient(120deg, rgba(255,255,255,0.00) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0.70) 50%, rgba(255,255,255,0.18) 62%, rgba(255,255,255,0.00) 100%);
+        transform: rotate(22deg);
+        animation: downloadShine 4.6s infinite ease-in-out;
+        pointer-events: none;
+    }
+    @keyframes downloadShine {
+        0% { left: -65%; opacity: 0; }
+        30% { opacity: 1; }
+        55% { left: 130%; opacity: 0; }
+        100% { left: 130%; opacity: 0; }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    def create_simple_pdf_report():
+        report_lines = [
+            "Sehhaty Smart Feedback Intelligence Platform",
+            "Filtered Reviews Report",
+            "",
+            f"Total filtered reviews: {total_reviews:,}",
+            f"Valid analysis rows: {len(analysis_df):,}",
+            f"Average rating: {avg_rating:.2f}",
+            f"Positive reviews: {positive_count:,} ({positive_rate:.1f}%)",
+            f"Negative reviews: {negative_count:,} ({negative_rate:.1f}%)",
+            f"Neutral reviews: {neutral_count:,}",
+            "",
+            f"Top theme: {top_theme_name}",
+            f"Top subtheme: {top_subtheme_name}",
+            f"Main negative theme: {top_negative_theme_name}",
+            "",
+            "Recommended actions:",
+        ]
+
+        for item in recommendations:
+            report_lines.append(f"- {item}")
+
+        def pdf_escape(value):
+            value = str(value).encode("latin-1", "replace").decode("latin-1")
+            return value.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+
+        text_commands = ["BT", "/F1 18 Tf", "72 750 Td", f"({pdf_escape(report_lines[0])}) Tj", "/F1 11 Tf", "0 -28 Td"]
+        for line in report_lines[1:]:
+            text_commands.append(f"({pdf_escape(line)}) Tj")
+            text_commands.append("0 -16 Td")
+        text_commands.append("ET")
+        stream = "\n".join(text_commands).encode("latin-1", "replace")
+
+        objects = [
+            b"<< /Type /Catalog /Pages 2 0 R >>",
+            b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+            b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+            b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+            b"<< /Length " + str(len(stream)).encode() + b" >>\nstream\n" + stream + b"\nendstream",
+        ]
+
+        pdf = bytearray(b"%PDF-1.4\n")
+        offsets = [0]
+        for index, obj in enumerate(objects, start=1):
+            offsets.append(len(pdf))
+            pdf.extend(f"{index} 0 obj\n".encode())
+            pdf.extend(obj)
+            pdf.extend(b"\nendobj\n")
+
+        xref_start = len(pdf)
+        pdf.extend(f"xref\n0 {len(objects) + 1}\n".encode())
+        pdf.extend(b"0000000000 65535 f \n")
+        for offset in offsets[1:]:
+            pdf.extend(f"{offset:010d} 00000 n \n".encode())
+        pdf.extend(f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_start}\n%%EOF".encode())
+        return bytes(pdf)
+
+    pdf_file = create_simple_pdf_report()
+
+    st.download_button(
+        label="📄 Download PDF Report",
+        data=pdf_file,
+        file_name="sehhaty_dashboard_report.pdf",
+        mime="application/pdf",
         use_container_width=True
     )
