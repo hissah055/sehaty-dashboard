@@ -375,20 +375,54 @@ st.markdown(
 
 
 
+    /* Main primary button style */
     div.stButton > button[kind="primary"] {
+        position: relative !important;
+        overflow: hidden !important;
         background: linear-gradient(135deg, var(--accent-main), var(--accent-dark)) !important;
         color: white !important;
         border: none !important;
-        border-radius: 12px !important;
-        font-weight: 800 !important;
-        box-shadow: 0 8px 20px rgba(15, 118, 110, 0.25) !important;
+        border-radius: 16px !important;
+        min-height: 62px !important;
+        font-size: 19px !important;
+        font-weight: 900 !important;
+        letter-spacing: 0.2px !important;
+        box-shadow: 0 12px 28px rgba(15, 118, 110, 0.35) !important;
+        transition: all 0.25s ease !important;
     }
 
+    /* Soft shine animation for Run Analysis button */
+    div.stButton > button[kind="primary"]::after {
+        content: "";
+        position: absolute;
+        top: -70%;
+        left: -60%;
+        width: 34%;
+        height: 240%;
+        background: linear-gradient(
+            120deg,
+            rgba(255,255,255,0.00) 0%,
+            rgba(255,255,255,0.10) 38%,
+            rgba(255,255,255,0.32) 50%,
+            rgba(255,255,255,0.10) 62%,
+            rgba(255,255,255,0.00) 100%
+        );
+        transform: rotate(22deg);
+        animation: runButtonShine 4.2s infinite ease-in-out;
+        pointer-events: none;
+    }
 
+    @keyframes runButtonShine {
+        0% { left: -65%; opacity: 0; }
+        28% { opacity: 0.95; }
+        52% { left: 130%; opacity: 0; }
+        100% { left: 130%; opacity: 0; }
+    }
 
     div.stButton > button[kind="primary"]:hover {
-        filter: brightness(1.08);
-        transform: translateY(-1px);
+        filter: brightness(1.10) !important;
+        transform: translateY(-3px) scale(1.01) !important;
+        box-shadow: 0 16px 36px rgba(15, 118, 110, 0.45) !important;
     }
 
 
@@ -397,6 +431,210 @@ st.markdown(
         border-radius: 12px !important;
         font-weight: 700 !important;
     }
+
+
+    /* ========================= */
+    /* AI Assistant special styling */
+    /* ========================= */
+    .ai-super-card {
+        position: relative;
+        overflow: visible;
+        margin: 26px 0 22px 0;
+        padding: 34px 34px;
+        border-radius: 30px;
+        background:
+            radial-gradient(circle at 16% 86%, rgba(167,139,250,0.28) 0%, rgba(167,139,250,0.00) 32%),
+            radial-gradient(circle at 88% 12%, rgba(34,211,238,0.18) 0%, rgba(34,211,238,0.00) 28%),
+            linear-gradient(135deg, #130A3A 0%, #0B1B3A 44%, #101827 100%);
+        color: #FFFFFF;
+        border: 1px solid rgba(168,85,247,0.65);
+        box-shadow: 0 18px 45px rgba(8,145,178,0.18), 0 0 34px rgba(168,85,247,0.22);
+    }
+    .ai-super-card::after {
+        content: "";
+        position: absolute;
+        right: -70px;
+        top: -80px;
+        width: 210px;
+        height: 210px;
+        background: rgba(255,255,255,0.13);
+        border-radius: 50%;
+        filter: blur(1px);
+    }
+    .ai-row { display: flex; align-items: center; gap: 24px; position: relative; z-index: 2; }
+    .ai-robot-stage {
+        position: relative;
+        width: 165px;
+        height: 205px;
+        flex: 0 0 165px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: aiBotFloat 2.8s infinite ease-in-out;
+    }
+    .ai-robot-stage::after {
+        content: "";
+        position: absolute;
+        bottom: 3px;
+        width: 118px;
+        height: 16px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(34,211,238,0.52), rgba(167,139,250,0.18), transparent 72%);
+        filter: blur(2px);
+    }
+    .ai-antenna-left, .ai-antenna-right {
+        position: absolute;
+        top: 10px;
+        width: 7px;
+        height: 38px;
+        background: linear-gradient(180deg, #F472B6, #22D3EE);
+        border-radius: 999px;
+        z-index: 4;
+    }
+    .ai-antenna-left { left: 49px; transform: rotate(-9deg); }
+    .ai-antenna-right { right: 49px; transform: rotate(9deg); }
+    .ai-antenna-left::before, .ai-antenna-right::before {
+        content: "";
+        position: absolute;
+        top: -12px;
+        left: -6px;
+        width: 19px;
+        height: 19px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #FDE68A, #F59E0B);
+        box-shadow: 0 0 14px rgba(251,191,36,0.65);
+    }
+    .ai-robot-head {
+        position: absolute;
+        top: 39px;
+        width: 122px;
+        height: 91px;
+        border-radius: 34px;
+        background: linear-gradient(135deg, #F9A8D4 0%, #A78BFA 44%, #22D3EE 100%);
+        border: 4px solid rgba(255,255,255,0.78);
+        box-shadow: 0 16px 32px rgba(0,0,0,0.28), inset 0 0 20px rgba(255,255,255,0.36);
+        z-index: 5;
+    }
+    .ai-robot-face {
+        position: absolute;
+        inset: 16px 15px;
+        border-radius: 24px;
+        background: #07111F;
+        box-shadow: inset 0 0 18px rgba(34,211,238,0.34);
+    }
+    .ai-eye-left, .ai-eye-right {
+        position: absolute;
+        top: 23px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border-bottom: 5px solid #22D3EE;
+        filter: drop-shadow(0 0 7px #22D3EE);
+    }
+    .ai-eye-left { left: 25px; }
+    .ai-eye-right { right: 25px; }
+    .ai-smile {
+        position: absolute;
+        left: 39px;
+        top: 45px;
+        width: 32px;
+        height: 18px;
+        border-bottom: 5px solid #22D3EE;
+        border-radius: 0 0 30px 30px;
+        filter: drop-shadow(0 0 7px #22D3EE);
+    }
+    .ai-robot-body {
+        position: absolute;
+        top: 122px;
+        width: 72px;
+        height: 60px;
+        border-radius: 24px 24px 20px 20px;
+        background: linear-gradient(135deg, #FFFFFF, #CBD5E1 45%, #A78BFA);
+        border: 3px solid rgba(255,255,255,0.72);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.23);
+        z-index: 3;
+    }
+    .ai-robot-core {
+        position: absolute;
+        left: 22px;
+        top: 16px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #07111F;
+        border: 2px solid #22D3EE;
+        box-shadow: 0 0 12px rgba(34,211,238,0.75);
+    }
+    .ai-robot-core::after {
+        content: "⌁";
+        position: absolute;
+        left: 5px;
+        top: 0px;
+        color: #22D3EE;
+        font-size: 22px;
+        font-weight: 900;
+    }
+    .ai-arm-left, .ai-arm-right {
+        position: absolute;
+        top: 132px;
+        width: 42px;
+        height: 15px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #E5E7EB, #94A3B8);
+        border: 2px solid rgba(255,255,255,0.55);
+        z-index: 2;
+    }
+    .ai-arm-left { left: 24px; transform: rotate(24deg); }
+    .ai-arm-right { right: 22px; transform-origin: left center; animation: aiWave 1.6s infinite ease-in-out; }
+    .ai-hand-left, .ai-hand-right {
+        position: absolute;
+        top: 141px;
+        width: 19px;
+        height: 19px;
+        border-radius: 50%;
+        background: #F8FAFC;
+        border: 2px solid rgba(148,163,184,0.8);
+        z-index: 3;
+    }
+    .ai-hand-left { left: 18px; }
+    .ai-hand-right { right: 14px; animation: aiHandWave 1.6s infinite ease-in-out; }
+    .ai-leg-left, .ai-leg-right {
+        position: absolute;
+        top: 178px;
+        width: 20px;
+        height: 27px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #CBD5E1, #64748B);
+        z-index: 2;
+    }
+    .ai-leg-left { left: 62px; }
+    .ai-leg-right { right: 62px; }
+    @keyframes aiWave { 0%,100% { transform: rotate(-24deg); } 50% { transform: rotate(-48deg); } }
+    @keyframes aiHandWave { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px) translateX(7px); } }
+    .ai-title { font-size: 35px; font-weight: 950; margin: 0 0 8px 0; line-height: 1.12; }
+    .ai-subtitle { font-size: 17px; font-weight: 750; margin: 0; opacity: 0.96; line-height: 1.55; }
+    .ai-hi {
+        display: inline-block; margin-top: 12px; padding: 8px 14px; border-radius: 999px;
+        background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.28); font-weight: 850;
+        animation: aiPulse 1.8s infinite ease-in-out;
+    }
+    .ai-answer-box {
+        position: relative; overflow: hidden;
+        background: linear-gradient(135deg, rgba(79,70,229,0.30), rgba(8,145,178,0.25), rgba(15,118,110,0.22));
+        border: 1px solid rgba(125,211,252,0.45); color: #F0FDFF; padding: 22px 24px; border-radius: 22px;
+        box-shadow: 0 12px 34px rgba(0,0,0,0.22), 0 0 22px rgba(8,145,178,0.18);
+        font-size: 16.5px; line-height: 1.78; margin-top: 12px;
+    }
+    .ai-answer-box::before { content: ""; position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: linear-gradient(180deg, #A78BFA, #22D3EE, #34D399); }
+    .upload-ai-loader {
+        position: relative; overflow: hidden; margin: 14px 0 18px 0; padding: 18px 20px; border-radius: 22px;
+        background: linear-gradient(135deg, rgba(79,70,229,0.18), rgba(8,145,178,0.16), rgba(15,118,110,0.16));
+        border: 1px solid rgba(34,211,238,0.30); color: #EFFFFF; box-shadow: 0 12px 30px rgba(0,0,0,0.16); font-weight: 800;
+    }
+    .upload-ready-card { padding: 14px 18px; border-radius: 18px; background: rgba(16,185,129,0.16); border: 1px solid rgba(52,211,153,0.45); color: #D1FAE5; font-weight: 850; margin-bottom: 14px; }
+    @keyframes aiBotFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(-1.5deg); } }
+    @keyframes aiPulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,255,255,0); } 50% { transform: scale(1.035); box-shadow: 0 0 18px rgba(255,255,255,0.22); } }
+
     </style>
     """,
     unsafe_allow_html=True
@@ -449,6 +687,7 @@ def load_excel(file):
 # =========================
 # Export Excel Function
 # =========================
+@st.cache_data(show_spinner=False)
 def convert_df_to_excel(dataframe):
     output = BytesIO()
 
@@ -637,16 +876,12 @@ def clear_dashboard_filters():
         "filter_sentiments",
         "filter_themes",
         "filter_subthemes",
-        "review_search_keyword",
     ]
 
 
 
     for key in filter_keys:
-        if key == "review_search_keyword":
-            st.session_state[key] = ""
-        else:
-            st.session_state[key] = []
+        st.session_state[key] = []
 
 
 
@@ -660,7 +895,6 @@ def clear_dashboard_filters():
         tuple(),
         tuple(),
         tuple(),
-        "",
     )
 
 
@@ -876,7 +1110,49 @@ uploaded_file = st.file_uploader("📂 Upload Excel file", type=["xlsx"])
 
 
 if uploaded_file:
-    df = load_excel(uploaded_file)
+    # =========================
+    # Friendly File Loading Animation
+    # =========================
+    file_signature = (uploaded_file.name, getattr(uploaded_file, "size", 0))
+
+    if st.session_state.get("loaded_file_signature") != file_signature:
+        st.markdown(
+            f"""
+            <div class="upload-ai-loader">
+                🤖 Hi! I am reading your data now... preparing your smart dashboard ✨
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        upload_progress = st.progress(0, text="Starting file check...")
+        loading_steps = [
+            (20, "🤖 Hi! Reading the uploaded file..."),
+            (45, "🧹 Checking columns and cleaning data..."),
+            (70, "🧠 Preparing AI-style insights..."),
+            (90, "📊 Getting dashboard filters ready..."),
+            (100, "✅ File is ready!")
+        ]
+
+        for percent, message in loading_steps:
+            time.sleep(0.05)
+            upload_progress.progress(percent, text=message)
+
+        df = load_excel(uploaded_file)
+        upload_progress.empty()
+        st.session_state["loaded_file_signature"] = file_signature
+
+        st.markdown(
+            """
+            <div class="upload-ready-card">
+                ✅ File loaded successfully. Choose filters, then click Run Analysis to generate charts and AI insights.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        df = load_excel(uploaded_file)
+
     df = add_time_features(df)
 
 
@@ -884,6 +1160,36 @@ if uploaded_file:
     # =========================
     # Column Settings
     # =========================
+    def get_default_col_index(columns, preferred_names, keyword_groups=None, fallback=0):
+        """
+        Pick the best default column automatically.
+        Exact name match is tried first, then normalized keyword matching.
+        """
+        col_list = list(columns)
+
+        # Exact match first
+        for preferred in preferred_names:
+            if preferred in col_list:
+                return col_list.index(preferred)
+
+        # Normalized exact match
+        normalized_map = {normalize_col_name(col): i for i, col in enumerate(col_list)}
+        for preferred in preferred_names:
+            preferred_clean = normalize_col_name(preferred)
+            if preferred_clean in normalized_map:
+                return normalized_map[preferred_clean]
+
+        # Keyword matching
+        if keyword_groups:
+            for keywords in keyword_groups:
+                for i, col in enumerate(col_list):
+                    col_clean = normalize_col_name(col)
+                    if all(keyword in col_clean for keyword in keywords):
+                        return i
+
+        return fallback if 0 <= fallback < len(col_list) else 0
+
+
     st.sidebar.header("⚙️ Column Settings")
 
 
@@ -891,7 +1197,12 @@ if uploaded_file:
     text_col = st.sidebar.selectbox(
         "Review text column",
         df.columns,
-        index=list(df.columns).index("Content_Clean") if "Content_Clean" in df.columns else 0
+        index=get_default_col_index(
+            df.columns,
+            preferred_names=["Content_Clean", "🧹Content_Clean", "Content Clean", "Clean_Content"],
+            keyword_groups=[["content", "clean"], ["review", "text"], ["comment", "clean"], ["content"]],
+            fallback=0
+        )
     )
 
 
@@ -899,7 +1210,12 @@ if uploaded_file:
     sentiment_col = st.sidebar.selectbox(
         "Sentiment column",
         df.columns,
-        index=list(df.columns).index("Sentiment") if "Sentiment" in df.columns else 0
+        index=get_default_col_index(
+            df.columns,
+            preferred_names=["Sentiment", "😊 Sentiment", "Sentiment_Clean"],
+            keyword_groups=[["sentiment"], ["emotion"]],
+            fallback=0
+        )
     )
 
 
@@ -907,7 +1223,12 @@ if uploaded_file:
     theme_col = st.sidebar.selectbox(
         "Main Theme column",
         df.columns,
-        index=list(df.columns).index("Theme") if "Theme" in df.columns else 0
+        index=get_default_col_index(
+            df.columns,
+            preferred_names=["Theme", "🎯 Theme", "Main Theme", "Main_Theme"],
+            keyword_groups=[["theme"]],
+            fallback=0
+        )
     )
 
 
@@ -915,7 +1236,12 @@ if uploaded_file:
     subtheme_col = st.sidebar.selectbox(
         "Subtheme column",
         df.columns,
-        index=list(df.columns).index("Subtheme") if "Subtheme" in df.columns else 0
+        index=get_default_col_index(
+            df.columns,
+            preferred_names=["Subtheme", "🧩 Subtheme", "Sub Theme", "Sub_Theme"],
+            keyword_groups=[["subtheme"], ["sub", "theme"]],
+            fallback=0
+        )
     )
 
 
@@ -923,7 +1249,12 @@ if uploaded_file:
     language_col = st.sidebar.selectbox(
         "Language column",
         df.columns,
-        index=list(df.columns).index("Language") if "Language" in df.columns else 0
+        index=get_default_col_index(
+            df.columns,
+            preferred_names=["Language", "🌐 Language", "Lang"],
+            keyword_groups=[["language"], ["lang"]],
+            fallback=0
+        )
     )
 
 
@@ -931,7 +1262,12 @@ if uploaded_file:
     rating_col = st.sidebar.selectbox(
         "Rating column",
         df.columns,
-        index=list(df.columns).index("Rating") if "Rating" in df.columns else 0
+        index=get_default_col_index(
+            df.columns,
+            preferred_names=["Rating", "⭐Rating", "⭐ Rating", "Review_Rating"],
+            keyword_groups=[["rating"], ["star"]],
+            fallback=0
+        )
     )
 
 
@@ -1213,24 +1549,7 @@ if uploaded_file:
 
 
     with info_col:
-        st.caption("No selection means All. Choose the filters and search keyword, then click Run Analysis to display the dashboard.")
-
-
-
-    # =========================
-    # Search Inside Reviews
-    # =========================
-    st.markdown("---")
-    st.subheader("🔎 Search Inside Reviews")
-    st.caption("Type any keyword to search within the filtered reviews, such as login, appointment, and error.")
-
-
-
-    search_keyword = st.text_input(
-        "Search keyword",
-        placeholder="Example: login, error, appointment",
-        key="review_search_keyword"
-    )
+        st.caption("No selection means All. Choose the filters, then click Run Analysis to display the dashboard.")
 
 
 
@@ -1246,7 +1565,6 @@ if uploaded_file:
         tuple(selected_sentiments),
         tuple(selected_themes),
         tuple(selected_subthemes),
-        search_keyword.strip(),
     )
 
 
@@ -1262,7 +1580,24 @@ if uploaded_file:
 
 
 
-    run_col, note_col = st.columns([1.2, 4.8])
+    st.markdown(
+        """
+        <div style="
+            background: rgba(8,145,178,0.12);
+            border: 1px solid rgba(34,211,238,0.35);
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin: 10px 0 12px 0;
+            color: #DFFBFF;
+            font-weight: 750;
+        ">
+            🚀 After choosing your filters, click <b>Run Analysis</b> to refresh all charts, AI-style insights, and the AI chat answer.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    run_col, note_col = st.columns([1.5, 4.5])
 
 
 
@@ -1272,7 +1607,7 @@ if uploaded_file:
 
 
     with note_col:
-        st.caption("The charts and results will appear after clicking Run Analysis.")
+        st.caption("The charts and results will appear after clicking Run Analysis. Change any filter, then click the button again to update the dashboard.")
 
 
 
@@ -1282,22 +1617,22 @@ if uploaded_file:
 
 
         progress_bar.progress(25, text="Applying selected filters...")
-        time.sleep(0.25)
+        time.sleep(0.08)
 
 
 
         progress_bar.progress(55, text="Calculating indicators...")
-        time.sleep(0.25)
+        time.sleep(0.08)
 
 
 
         progress_bar.progress(80, text="Building charts...")
-        time.sleep(0.25)
+        time.sleep(0.08)
 
 
 
         progress_bar.progress(100, text="Analysis completed!")
-        time.sleep(0.25)
+        time.sleep(0.08)
 
 
 
@@ -1307,7 +1642,7 @@ if uploaded_file:
 
 
     if not st.session_state.get("analysis_ready", False):
-        st.info("👆 Please choose the filters or search keyword, then click **Run Analysis** to display the dashboard charts and results.")
+        st.info("👆 Please choose the filters, then click **Run Analysis** to display the dashboard charts and results.")
         st.stop()
 
 
@@ -1362,15 +1697,6 @@ if uploaded_file:
 
 
     analysis_source_df = apply_dashboard_filters(filter_df)
-
-
-
-    if search_keyword.strip():
-        analysis_source_df = analysis_source_df[
-            analysis_source_df[text_col]
-            .astype(str)
-            .str.contains(search_keyword.strip(), case=False, na=False)
-        ]
 
 
 
@@ -1453,6 +1779,70 @@ if uploaded_file:
         if not negative_df_for_summary.empty and not negative_df_for_summary[theme_col].value_counts().empty
         else "N/A"
     )
+
+
+
+    # =========================
+    # Advanced AI Insight Helpers
+    # =========================
+    clean_text_col = "Content_Clean" if "Content_Clean" in analysis_df.columns else text_col
+
+    def top_count_items(dataframe, column_name, top_n=5):
+        if dataframe.empty or column_name not in dataframe.columns:
+            return []
+        counts = dataframe[column_name].dropna().astype(str).value_counts().head(top_n)
+        return [(str(name), int(count)) for name, count in counts.items()]
+
+    negative_problem_items = top_count_items(negative_df_for_summary, subtheme_col, 5)
+    if not negative_problem_items:
+        negative_problem_items = top_count_items(negative_df_for_summary, theme_col, 5)
+
+    top_problem_text = negative_problem_items[0][0] if negative_problem_items else top_negative_theme_name
+
+    # =========================
+    # Smart Alert System
+    # =========================
+    if negative_rate >= 40:
+        alert_color = "#7F1D1D"
+        alert_title = "🚨 Critical Alert"
+        alert_message = "Negative feedback is high. Immediate review of low-rating comments is recommended."
+    elif negative_rate >= 30:
+        alert_color = "#B45309"
+        alert_title = "⚠️ Attention Needed"
+        alert_message = "Negative feedback is moderate/high. Focus on the most repeated complaint areas."
+    else:
+        alert_color = "#0F766E"
+        alert_title = "✅ Healthy Feedback Level"
+        alert_message = "Overall feedback looks positive. Continue monitoring negative comments for early signs."
+
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, {alert_color}, #111827); color: white; padding: 18px 22px; border-radius: 18px; margin: 18px 0; box-shadow: 0 12px 28px rgba(0,0,0,0.24); border: 1px solid rgba(255,255,255,0.18); animation: softPop 0.7s ease both;">
+        <div style="font-size:23px; font-weight:900; margin-bottom:6px;">{alert_title}</div>
+        <div style="font-size:16px; font-weight:700; line-height:1.6;">{alert_message}</div>
+    </div>
+    <style>
+    @keyframes softPop {{ from {{ opacity:0; transform: translateY(12px) scale(0.98); }} to {{ opacity:1; transform: translateY(0) scale(1); }} }}
+    </style>
+    """, unsafe_allow_html=True)
+
+    # =========================
+    # Focus Mode Toggle
+    # =========================
+    focus_mode = st.toggle(
+        "🎯 Focus Mode: show problem-focused insights",
+        value=False,
+        help="Turn this on to quickly review negative issues, top problems, and urgent recommendations."
+    )
+
+    if focus_mode:
+        focus_items_html = "".join([f"<li><b>{name}</b> — {count:,} negative reviews</li>" for name, count in negative_problem_items]) or "<li>No negative problem pattern detected.</li>"
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #1E1B4B, #312E81, #0F766E); color:white; padding:24px; border-radius:22px; border:1px solid rgba(255,255,255,0.20); box-shadow:0 14px 34px rgba(0,0,0,0.28); margin:16px 0 22px 0;">
+            <div style="font-size:27px; font-weight:950; margin-bottom:10px;">🎯 Problem Focus Mode</div>
+            <div style="font-size:16px; line-height:1.7; margin-bottom:12px;">Main concern: <b>{top_negative_theme_name}</b> | Most repeated problem: <b>{top_problem_text}</b> | Negative rate: <b>{negative_rate:.1f}%</b></div>
+            <ul style="font-size:16px; line-height:1.8; margin-bottom:0;">{focus_items_html}</ul>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 
@@ -1547,6 +1937,12 @@ if uploaded_file:
     font-size: 30px;
     font-weight: 850;
     line-height: 1.2;
+    animation: numberGlow 1.2s ease both;
+}}
+@keyframes numberGlow {{
+    0% {{ opacity: 0; transform: translateY(10px) scale(0.96); filter: blur(2px); }}
+    60% {{ opacity: 1; transform: translateY(-2px) scale(1.03); filter: blur(0); }}
+    100% {{ opacity: 1; transform: translateY(0) scale(1); }}
 }}
 .metric-icon {{
     font-size: 24px;
@@ -1684,6 +2080,8 @@ if uploaded_file:
 
 
     # =========================
+    # =========================
+    # =========================
     # WOW Section: User Satisfaction + Review Storytelling + Top Keywords
     # =========================
     st.markdown("---")
@@ -1820,12 +2218,24 @@ if uploaded_file:
 
 
     if top_negative_theme_name != "N/A":
-        recommendations.append(f"Focus improvement efforts on: {top_negative_theme_name}.")
+        recommendations.append(f"Focus improvement efforts on the main negative theme: {top_negative_theme_name}.")
+
+
+
+    if top_problem_text != "N/A":
+        recommendations.append(f"Create an action plan for the most repeated problem: {top_problem_text}.")
 
 
 
     if top_subtheme_name != "N/A":
-        recommendations.append(f"Investigate the most frequent subtheme: {top_subtheme_name}.")
+        recommendations.append(f"Investigate the most frequent subtheme across all reviews: {top_subtheme_name}.")
+
+
+
+    if avg_rating < 4:
+        recommendations.append("Average rating is below 4.00; review usability, access, and technical barriers urgently.")
+    else:
+        recommendations.append("Maintain the strengths behind the high average rating while fixing repeated negative patterns.")
 
 
 
@@ -1876,6 +2286,415 @@ if uploaded_file:
 
 
 
+    # =========================
+    # AI Auto Insights - Pro Level
+    # =========================
+    st.markdown("---")
+    st.markdown("### 🤖 AI Auto Insights")
+
+    top_problem_count = negative_problem_items[0][1] if negative_problem_items else 0
+    top_problem_share = (top_problem_count / negative_count * 100) if negative_count > 0 else 0
+
+    if negative_rate >= 35:
+        ai_priority_level = "High priority"
+        ai_priority_color = "#B91C1C"
+        ai_priority_icon = "🚨"
+        ai_priority_message = "Negative feedback needs close attention. Start with the repeated issue below."
+    elif negative_rate >= 20:
+        ai_priority_level = "Medium priority"
+        ai_priority_color = "#B45309"
+        ai_priority_icon = "⚠️"
+        ai_priority_message = "Feedback is generally acceptable, but repeated complaints should be handled."
+    else:
+        ai_priority_level = "Stable"
+        ai_priority_color = "#0F766E"
+        ai_priority_icon = "✅"
+        ai_priority_message = "Overall feedback is positive. Keep monitoring the main complaint pattern."
+
+    ai_strength_text = top_theme_name if top_theme_name != "N/A" else "User satisfaction"
+    ai_action_text = top_problem_text if top_problem_text != "N/A" else top_negative_theme_name
+
+    st.markdown(f"""
+    <style>
+    .ai-auto-grid {{
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr;
+        gap: 16px;
+        margin: 14px 0 20px 0;
+    }}
+    .ai-auto-card {{
+        background: linear-gradient(135deg, #111827, #0B1B3A 55%, #0F766E);
+        color: white;
+        padding: 20px 22px;
+        border-radius: 20px;
+        border: 1px solid rgba(34,211,238,0.25);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        min-height: 145px;
+        animation: aiCardIn 0.65s ease both;
+    }}
+    .ai-auto-card.priority {{
+        background: linear-gradient(135deg, {ai_priority_color}, #111827);
+    }}
+    .ai-auto-title {{
+        font-size: 16px;
+        font-weight: 900;
+        opacity: 0.92;
+        margin-bottom: 10px;
+    }}
+    .ai-auto-value {{
+        font-size: 23px;
+        font-weight: 950;
+        line-height: 1.35;
+        margin-bottom: 8px;
+    }}
+    .ai-auto-note {{
+        font-size: 14px;
+        font-weight: 750;
+        line-height: 1.65;
+        color: #DFFBFF;
+    }}
+    @keyframes aiCardIn {{
+        from {{ opacity: 0; transform: translateY(14px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }}
+    @media (max-width: 1000px) {{
+        .ai-auto-grid {{ grid-template-columns: 1fr; }}
+    }}
+    </style>
+
+    <div class="ai-auto-grid">
+        <div class="ai-auto-card priority">
+            <div class="ai-auto-title">{ai_priority_icon} AI Priority Signal</div>
+            <div class="ai-auto-value">{ai_priority_level}</div>
+            <div class="ai-auto-note">{ai_priority_message}<br>
+            Negative rate: <b>{negative_rate:.1f}%</b> | Avg rating: <b>{avg_rating:.2f}</b></div>
+        </div>
+        <div class="ai-auto-card">
+            <div class="ai-auto-title">🚨 Top Issue to Watch</div>
+            <div class="ai-auto-value">{ai_action_text}</div>
+            <div class="ai-auto-note">{top_problem_count:,} negative reviews
+            {f"({top_problem_share:.1f}% of negative feedback)" if negative_count > 0 else ""}</div>
+        </div>
+        <div class="ai-auto-card">
+            <div class="ai-auto-title">💡 Recommended Focus</div>
+            <div class="ai-auto-value">{ai_strength_text}</div>
+            <div class="ai-auto-note">Use this theme to understand what users mention most, then compare it with negative subthemes.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # =========================
+    # AI Chat Assistant - Rule-Based Dashboard Q&A
+    # =========================
+    st.markdown("---")
+    st.markdown(
+        """
+        <div class="ai-super-card">
+            <div class="ai-row">
+                <div class="ai-robot-stage" aria-hidden="true">
+                    <div class="ai-antenna-left"></div>
+                    <div class="ai-antenna-right"></div>
+                    <div class="ai-robot-head">
+                        <div class="ai-robot-face">
+                            <div class="ai-eye-left"></div>
+                            <div class="ai-eye-right"></div>
+                            <div class="ai-smile"></div>
+                        </div>
+                    </div>
+                    <div class="ai-robot-body"><div class="ai-robot-core"></div></div>
+                    <div class="ai-arm-left"></div>
+                    <div class="ai-arm-right"></div>
+                    <div class="ai-hand-left"></div>
+                    <div class="ai-hand-right"></div>
+                    <div class="ai-leg-left"></div>
+                    <div class="ai-leg-right"></div>
+                </div>
+                <div>
+                    <div class="ai-title">Sehhaty AI Assistant</div>
+                    <p class="ai-subtitle">Hi 👋 I am your smart assistant. Ask me about the filtered reviews, negative issues, top themes, ratings, or recommended actions.</p>
+                    <span class="ai-hi">I am ready to analyze your reviews ✨</span>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    ai_col1, ai_col2 = st.columns([4.5, 1.2])
+
+    with ai_col1:
+        ai_question = st.text_input(
+            "AI question",
+            placeholder="Example: What are the main issues in negative reviews?",
+            key="ai_question_input"
+        )
+
+    with ai_col2:
+        ask_ai = st.button("💬 Ask AI", type="primary", use_container_width=True)
+
+    def get_top_items(dataframe, column_name, top_n=3):
+        if dataframe.empty or column_name not in dataframe.columns:
+            return []
+        counts = dataframe[column_name].dropna().astype(str).value_counts().head(top_n)
+        return [f"{name} ({count:,})" for name, count in counts.items()]
+
+    def get_example_review(dataframe):
+        if dataframe.empty or clean_text_col not in dataframe.columns:
+            return "No example review is available for the selected filters."
+        text_values = dataframe[clean_text_col].dropna().astype(str)
+        text_values = text_values[text_values.str.strip() != ""]
+        if text_values.empty:
+            return "No example review text is available for the selected filters."
+        return text_values.iloc[0]
+
+    def format_items_html(title, items, icon="•"):
+        if not items:
+            return f"<div><b>{title}</b><br>N/A</div>"
+        rows = "".join([f"<li>{icon} {item}</li>" for item in items])
+        return f"<div><b>{title}</b><ul style='margin-top:8px; margin-bottom:10px;'>{rows}</ul></div>"
+
+    def get_top_items(dataframe, column_name, top_n=3):
+        if dataframe.empty or column_name not in dataframe.columns:
+            return []
+        counts = dataframe[column_name].dropna().astype(str).value_counts().head(top_n)
+        return [f"<b>{name}</b> — {count:,} reviews" for name, count in counts.items()]
+
+    def get_example_review(dataframe):
+        if dataframe.empty or clean_text_col not in dataframe.columns:
+            return "No example review is available for the selected filters."
+        text_values = dataframe[clean_text_col].dropna().astype(str)
+        text_values = text_values[text_values.str.strip() != ""]
+        if text_values.empty:
+            return "No example review text is available for the selected filters."
+        text = text_values.iloc[0]
+        return text[:420] + "..." if len(text) > 420 else text
+
+    def build_ai_answer(question):
+        q = str(question).lower().strip()
+
+        negative_only = analysis_df[analysis_df["Sentiment_Clean"] == "Negative"].copy()
+        positive_only = analysis_df[analysis_df["Sentiment_Clean"] == "Positive"].copy()
+        neutral_only = analysis_df[analysis_df["Sentiment_Clean"] == "Neutral"].copy()
+
+        top_negative_themes = get_top_items(negative_only, theme_col, 3)
+        top_negative_subthemes = get_top_items(negative_only, subtheme_col, 3)
+        top_overall_themes = get_top_items(analysis_df, theme_col, 3)
+        top_overall_subthemes = get_top_items(analysis_df, subtheme_col, 3)
+        top_positive_themes = get_top_items(positive_only, theme_col, 3)
+
+        top_problem_list = [
+            f"<b>{name}</b> — {count:,} negative reviews"
+            for name, count in negative_problem_items[:5]
+        ] if negative_problem_items else []
+
+        # Generic dashboard state used in most answers
+        dashboard_snapshot = f"""
+        <div style="margin-bottom:12px;">
+            <b>Current filtered dataset:</b> {total_reviews:,} reviews |
+            <b>Avg rating:</b> {avg_rating:.2f} |
+            <b>Positive:</b> {positive_rate:.1f}% |
+            <b>Negative:</b> {negative_rate:.1f}%
+        </div>
+        """
+
+        if not q:
+            return f"""
+            {dashboard_snapshot}
+            <b>Try asking me one of these:</b>
+            <ul>
+                <li>What are the main problems?</li>
+                <li>Give me recommendations.</li>
+                <li>Summarize the sentiment.</li>
+                <li>What changed over time?</li>
+            </ul>
+            """
+
+        # Negative / problems
+        if any(word in q for word in [
+            "negative", "unhappy", "complaint", "problem", "issue", "bad", "crash", "login", "otp",
+            "زعلان", "سلبي", "سلبية", "مشكلة", "مشاكل", "شكاوى", "تعطل", "دخول", "رمز"
+        ]):
+            return f"""
+            {dashboard_snapshot}
+            <b>🚨 Main negative concern:</b> {top_negative_theme_name}<br>
+            <b>Most repeated issue:</b> {top_problem_text}<br><br>
+            {format_items_html("Top detected problems", top_problem_list, "🔻")}
+            {format_items_html("Top negative themes", top_negative_themes, "📌")}
+            {format_items_html("Top negative subthemes", top_negative_subthemes, "🧩")}
+            <b>Recommended next action:</b> Start by reviewing low-rating reviews related to <b>{top_problem_text}</b>, then prioritize the fixes with the highest repeated count.
+            """
+
+        # Recommendations
+        if any(word in q for word in [
+            "recommend", "action", "improve", "fix", "next", "suggest", "solution",
+            "توص", "تحسين", "حل", "اقتراح", "إجراء", "وش نسوي"
+        ]):
+            rec_html = "".join([f"<li>{item}</li>" for item in recommendations])
+            return f"""
+            {dashboard_snapshot}
+            <b>💡 AI recommended action plan:</b>
+            <ol>
+                {rec_html}
+            </ol>
+            <b>Priority:</b> Focus first on <b>{top_problem_text}</b> because it is the most repeated negative pattern in the current filtered data.
+            """
+
+        # Positive / strengths
+        if any(word in q for word in [
+            "positive", "happy", "good", "satisfied", "strength", "best",
+            "إيجابي", "ايجابي", "ممتاز", "راضي", "أفضل", "قوة"
+        ]):
+            return f"""
+            {dashboard_snapshot}
+            <b>😊 Positive signal:</b> Positive reviews represent <b>{positive_rate:.1f}%</b> of valid reviews.<br>
+            <b>Most common overall theme:</b> {top_theme_name}<br>
+            <b>Most frequent subtheme:</b> {top_subtheme_name}<br><br>
+            {format_items_html("Top positive/overall themes", top_positive_themes if top_positive_themes else top_overall_themes, "✅")}
+            <b>Example positive review:</b><br>
+            <div style="margin-top:8px; padding:12px 14px; border-radius:14px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35);">
+                {get_example_review(positive_only)}
+            </div>
+            """
+
+        # Themes / subthemes
+        if any(word in q for word in [
+            "theme", "subtheme", "category", "topic", "موضوع", "مواضيع", "تصنيف", "فئة"
+        ]):
+            return f"""
+            {dashboard_snapshot}
+            {format_items_html("Top themes", top_overall_themes, "🏷️")}
+            {format_items_html("Top subthemes", top_overall_subthemes, "🧩")}
+            <b>Interpretation:</b> The theme with the highest volume is <b>{top_theme_name}</b>, which means users discuss this area most often in the current filtered dataset.
+            """
+
+        # Rating / score
+        if any(word in q for word in [
+            "rating", "average", "score", "stars", "تقييم", "متوسط", "نجوم"
+        ]):
+            rating_interpretation = (
+                "strong" if avg_rating >= 4.2 else
+                "acceptable but can improve" if avg_rating >= 3.5 else
+                "needs urgent improvement"
+            )
+            return f"""
+            {dashboard_snapshot}
+            <b>⭐ Rating overview:</b>
+            <ul>
+                <li>Average rating: <b>{avg_rating:.2f}</b></li>
+                <li>Positive reviews: <b>{positive_count:,}</b> ({positive_rate:.1f}%)</li>
+                <li>Negative reviews: <b>{negative_count:,}</b> ({negative_rate:.1f}%)</li>
+                <li>Neutral reviews: <b>{neutral_count:,}</b></li>
+            </ul>
+            <b>AI interpretation:</b> Rating performance is <b>{rating_interpretation}</b>. The fastest improvement opportunity is to reduce repeated negative issues such as <b>{top_problem_text}</b>.
+            """
+
+        # Compare / trend / year
+        if any(word in q for word in [
+            "compare", "trend", "year", "time", "change", "improve over time",
+            "تحسن", "مقارنة", "سنوات", "سنة", "زمن", "تغير"
+        ]):
+            year_df_for_ai = analysis_df.dropna(subset=["Dashboard_Year"]).copy()
+            if year_df_for_ai.empty:
+                return f"{dashboard_snapshot}<b>No year information is available in the selected data.</b>"
+
+            year_summary_ai = year_df_for_ai.groupby("Dashboard_Year").agg(
+                Reviews=("Dashboard_Year", "count"),
+                Avg_Rating=(rating_col, "mean"),
+                Negative_Count=("Sentiment_Clean", lambda s: (s == "Negative").sum())
+            ).reset_index().sort_values("Dashboard_Year")
+            year_summary_ai["Negative_Rate"] = year_summary_ai["Negative_Count"] / year_summary_ai["Reviews"] * 100
+
+            first = year_summary_ai.iloc[0]
+            last = year_summary_ai.iloc[-1]
+            rating_delta = last["Avg_Rating"] - first["Avg_Rating"]
+            neg_delta = last["Negative_Rate"] - first["Negative_Rate"]
+            review_delta = int(last["Reviews"] - first["Reviews"])
+
+            direction_text = "improved" if rating_delta > 0 else "declined" if rating_delta < 0 else "stayed stable"
+            return f"""
+            {dashboard_snapshot}
+            <b>📈 Time trend insight:</b>
+            <ul>
+                <li>Reviews changed from <b>{int(first['Reviews']):,}</b> in {int(first['Dashboard_Year'])} to <b>{int(last['Reviews']):,}</b> in {int(last['Dashboard_Year'])} ({review_delta:+,}).</li>
+                <li>Average rating {direction_text}: <b>{first['Avg_Rating']:.2f}</b> → <b>{last['Avg_Rating']:.2f}</b> ({rating_delta:+.2f}).</li>
+                <li>Negative rate changed by <b>{neg_delta:+.1f}%</b>.</li>
+            </ul>
+            <b>AI interpretation:</b> If negative rate is increasing, check the top problem area: <b>{top_problem_text}</b>.
+            """
+
+        # Language
+        if any(word in q for word in [
+            "language", "arabic", "english", "لغة", "عربي", "انجليزي", "إنجليزي"
+        ]):
+            if language_col not in analysis_df.columns:
+                return f"{dashboard_snapshot}<b>No language column is available in the selected data.</b>"
+
+            lang_summary = (
+                analysis_df.groupby(language_col)
+                .agg(
+                    Reviews=(language_col, "count"),
+                    Avg_Rating=(rating_col, "mean"),
+                    Negative_Count=("Sentiment_Clean", lambda s: (s == "Negative").sum())
+                )
+                .reset_index()
+                .sort_values("Reviews", ascending=False)
+            )
+            lang_summary["Negative_Rate"] = lang_summary["Negative_Count"] / lang_summary["Reviews"] * 100
+            rows = "".join([
+                f"<li><b>{row[language_col]}</b>: {int(row['Reviews']):,} reviews | Avg rating {row['Avg_Rating']:.2f} | Negative {row['Negative_Rate']:.1f}%</li>"
+                for _, row in lang_summary.head(5).iterrows()
+            ])
+            return f"""
+            {dashboard_snapshot}
+            <b>🌐 Language insight:</b>
+            <ul>{rows}</ul>
+            <b>AI interpretation:</b> Compare negative rates by language to see whether one user group faces more issues.
+            """
+
+        # Summary
+        if any(word in q for word in [
+            "summary", "summarize", "overview", "brief", "ملخص", "اختصر", "نظرة"
+        ]):
+            return f"""
+            {dashboard_snapshot}
+            <b>📌 Executive AI summary:</b><br>
+            The dashboard currently analyzes <b>{total_reviews:,}</b> filtered reviews. The overall rating is <b>{avg_rating:.2f}</b>.
+            Feedback is mostly <b>{'positive' if positive_count >= negative_count else 'negative'}</b>.
+            The leading theme is <b>{top_theme_name}</b>, while the main negative concern is <b>{top_negative_theme_name}</b>.
+            The most repeated issue to review is <b>{top_problem_text}</b>.
+            <br><br>
+            <b>Next step:</b> Use the negative reviews table and filters to inspect the repeated issue in detail.
+            """
+
+        # Default
+        return f"""
+        {dashboard_snapshot}
+        <b>🤖 I can answer questions about:</b>
+        <ul>
+            <li>Main problems and negative issues</li>
+            <li>Ratings and sentiment summary</li>
+            <li>Top themes and subthemes</li>
+            <li>Recommendations and next actions</li>
+            <li>Trends over years</li>
+            <li>Arabic vs English feedback</li>
+        </ul>
+        <b>Example:</b> “What are the main problems?” or “Give me recommendations.”
+        """
+
+    if ask_ai or ai_question.strip():
+        ai_answer = build_ai_answer(ai_question)
+        st.markdown(
+            f"""
+            <div class="ai-answer-box">
+                <b>🤖 AI Answer:</b><br>{ai_answer}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+
+
     st.markdown("---")
 
 
@@ -1884,6 +2703,80 @@ if uploaded_file:
     # Time Analysis: Year + Quarter
     # =========================
     st.subheader("📅 Time-Based Analysis")
+
+
+
+    # =========================
+    # =========================
+    # Year Comparison Tool - Faster Apply Mode
+    # =========================
+    available_compare_years = sorted([int(y) for y in analysis_df["Dashboard_Year"].dropna().unique().tolist()]) if "Dashboard_Year" in analysis_df.columns else []
+    if len(available_compare_years) >= 2:
+        st.markdown("### 📊 Compare Years")
+        st.caption("Choose the two years, then click Compare. This prevents the page from recalculating every time you change a year.")
+
+        yearly_compare_summary = (
+            analysis_df.dropna(subset=["Dashboard_Year"])
+            .assign(Dashboard_Year=lambda x: x["Dashboard_Year"].astype(int))
+            .groupby("Dashboard_Year")
+            .agg(
+                Total_Reviews=("Dashboard_Year", "count"),
+                Avg_Rating=(rating_col, "mean"),
+                Negative_Count=("Sentiment_Clean", lambda s: (s == "Negative").sum())
+            )
+            .reset_index()
+        )
+        yearly_compare_summary["Negative_Rate"] = yearly_compare_summary["Negative_Count"] / yearly_compare_summary["Total_Reviews"] * 100
+
+        if "compare_year_a_value" not in st.session_state:
+            st.session_state["compare_year_a_value"] = available_compare_years[max(0, len(available_compare_years)-2)]
+        if "compare_year_b_value" not in st.session_state:
+            st.session_state["compare_year_b_value"] = available_compare_years[-1]
+
+        with st.form("compare_years_form"):
+            compare_col1, compare_col2, compare_col3 = st.columns([2, 2, 1])
+            with compare_col1:
+                compare_year_a_input = st.selectbox("First year", available_compare_years, index=available_compare_years.index(st.session_state["compare_year_a_value"]) if st.session_state["compare_year_a_value"] in available_compare_years else 0)
+            with compare_col2:
+                compare_year_b_input = st.selectbox("Second year", available_compare_years, index=available_compare_years.index(st.session_state["compare_year_b_value"]) if st.session_state["compare_year_b_value"] in available_compare_years else len(available_compare_years)-1)
+            with compare_col3:
+                st.markdown("<br>", unsafe_allow_html=True)
+                compare_clicked = st.form_submit_button("⚡ Compare", use_container_width=True)
+
+        if compare_clicked:
+            st.session_state["compare_year_a_value"] = compare_year_a_input
+            st.session_state["compare_year_b_value"] = compare_year_b_input
+
+        compare_year_a = st.session_state["compare_year_a_value"]
+        compare_year_b = st.session_state["compare_year_b_value"]
+
+        a_row = yearly_compare_summary[yearly_compare_summary["Dashboard_Year"] == compare_year_a]
+        b_row = yearly_compare_summary[yearly_compare_summary["Dashboard_Year"] == compare_year_b]
+
+        if not a_row.empty and not b_row.empty:
+            a_total = int(a_row["Total_Reviews"].iloc[0])
+            b_total = int(b_row["Total_Reviews"].iloc[0])
+            a_avg = float(a_row["Avg_Rating"].iloc[0])
+            b_avg = float(b_row["Avg_Rating"].iloc[0])
+            a_neg = float(a_row["Negative_Rate"].iloc[0])
+            b_neg = float(b_row["Negative_Rate"].iloc[0])
+
+            rating_change = b_avg - a_avg
+            neg_change = b_neg - a_neg
+            review_change = b_total - a_total
+
+            comparison_html = f"""
+            <div style="background:linear-gradient(135deg,#0B1B3A,#0F766E); color:white; padding:22px; border-radius:20px; margin:12px 0 22px 0; box-shadow:0 12px 30px rgba(0,0,0,0.24); animation: cardRise 0.45s ease both;">
+                <div style="font-size:24px; font-weight:950; margin-bottom:12px;">📈 {compare_year_a} vs {compare_year_b}</div>
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;">
+                    <div><b>Reviews change</b><br><span style="font-size:24px; font-weight:950;">{review_change:+,}</span></div>
+                    <div><b>Avg rating change</b><br><span style="font-size:24px; font-weight:950;">{rating_change:+.2f}</span></div>
+                    <div><b>Negative rate change</b><br><span style="font-size:24px; font-weight:950;">{neg_change:+.1f}%</span></div>
+                </div>
+            </div>
+            """
+            st.markdown(comparison_html, unsafe_allow_html=True)
+
 
 
 
@@ -2385,6 +3278,25 @@ if uploaded_file:
 
         st.plotly_chart(fig_sent, width="stretch")
 
+        st.caption("Quick view: click a sentiment button to preview matching reviews.")
+        quick_cols = st.columns(3)
+        quick_sentiment = None
+        with quick_cols[0]:
+            if st.button("😊 View Positive", use_container_width=True, key="quick_positive"):
+                quick_sentiment = "Positive"
+        with quick_cols[1]:
+            if st.button("😟 View Negative", use_container_width=True, key="quick_negative"):
+                quick_sentiment = "Negative"
+        with quick_cols[2]:
+            if st.button("😐 View Neutral", use_container_width=True, key="quick_neutral"):
+                quick_sentiment = "Neutral"
+
+        if quick_sentiment:
+            quick_df = analysis_df[analysis_df["Sentiment_Clean"] == quick_sentiment].copy()
+            quick_df = remove_private_columns(quick_df.head(10))
+            st.markdown(f"#### {quick_sentiment} review preview")
+            st.dataframe(quick_df, width="stretch", hide_index=True)
+
 
 
     with colB:
@@ -2692,64 +3604,236 @@ if uploaded_file:
 
 
 
-    st.dataframe(full_filtered_df, width="stretch", hide_index=True)
+    # =========================
+    # Smart Table Display Control
+    # =========================
+    # Showing all rows in Streamlit can be slow for large files.
+    # Default mode shows only 500 rows for speed, but the user can choose to show all rows.
+    # Excel/PDF downloads still use the full filtered dataset.
+    preview_limit = 500
 
+    if "show_full_filtered_data" not in st.session_state:
+        st.session_state["show_full_filtered_data"] = False
 
+    st.markdown("### 📊 Display Options")
 
-    excel_file = convert_df_to_excel(full_filtered_df)
+    display_col1, display_col2 = st.columns([1.2, 4.8])
 
+    with display_col1:
+        if st.button(
+            "📂 Show Full Data",
+            use_container_width=True,
+            key="show_full_data_button",
+            help="Show all filtered rows on screen. This may be slower for large files."
+        ):
+            st.session_state["show_full_filtered_data"] = True
 
+    if st.session_state["show_full_filtered_data"]:
+        display_df = full_filtered_df
+        with display_col2:
+            st.warning(f"⚠️ Full view is ON: showing all {len(full_filtered_df):,} rows. This may be slower.")
+    else:
+        display_df = full_filtered_df.head(preview_limit)
+        with display_col2:
+            if len(full_filtered_df) > preview_limit:
+                st.info(f"Showing first {preview_limit:,} rows for performance. Download Excel to get all {len(full_filtered_df):,} filtered rows.")
+            else:
+                st.info(f"Showing all {len(full_filtered_df):,} filtered rows.")
 
-    st.download_button(
-        label="⬇️ Download filtered reviews as Excel",
-        data=excel_file,
-        file_name="sehhaty_filtered_reviews.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        use_container_width=True
-    )
+    st.caption(f"Rows displayed on screen: {len(display_df):,} / {len(full_filtered_df):,}. Downloads include the full filtered dataset.")
+    st.dataframe(display_df, width="stretch", hide_index=True)
+
 
     # =========================
-    # Extra PDF Download Button
+    # Export Downloads - Fast UI + Prepare Excel Only
     # =========================
-    st.markdown("""
+    st.markdown("---")
+
+    rows_to_export = len(full_filtered_df)
+
+    def get_export_image_base64():
+        """Load the export background image from the same folder as app.py."""
+        image_candidates = [
+            "hero_dashboard.png",
+            "hero_dashboard.jpg",
+            "hero_dashboard.jpeg",
+            "hero_dashboard.png.png",
+        ]
+
+        for image_name in image_candidates:
+            image_path = Path(image_name)
+            if image_path.exists():
+                return base64.b64encode(image_path.read_bytes()).decode()
+
+        return None
+
+    export_image_base64 = get_export_image_base64()
+
+    if export_image_base64:
+        export_card_background = (
+            "linear-gradient(90deg, rgba(3,7,18,0.78) 0%, rgba(8,145,178,0.56) 46%, rgba(79,70,229,0.34) 100%), "
+            f"url('data:image/png;base64,{export_image_base64}')"
+        )
+    else:
+        export_card_background = "linear-gradient(135deg, rgba(8,145,178,0.32), rgba(15,118,110,0.24), rgba(79,70,229,0.18))"
+
+    st.markdown(f"""
     <style>
-    div[data-testid="stDownloadButton"] > button {
-        position: relative !important;
-        overflow: hidden !important;
-        background: linear-gradient(135deg, #0891B2, #0F766E) !important;
-        color: #FFFFFF !important;
-        border: none !important;
-        border-radius: 16px !important;
-        min-height: 56px !important;
-        font-size: 17px !important;
-        font-weight: 850 !important;
-        box-shadow: 0 12px 28px rgba(15,118,110,0.28) !important;
-        transition: all 0.25s ease !important;
-    }
-    div[data-testid="stDownloadButton"] > button:hover {
-        transform: translateY(-3px) !important;
-        filter: brightness(1.08) !important;
-        box-shadow: 0 16px 34px rgba(15,118,110,0.38) !important;
-    }
-    div[data-testid="stDownloadButton"] > button::after {
+    .export-hero-card {{
+        position: relative;
+        overflow: hidden;
+        min-height: 330px;
+        border-radius: 28px;
+        padding: 34px 36px;
+        margin: 10px 0 24px 0;
+        background-image: {export_card_background};
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: 1px solid rgba(34,211,238,0.28);
+        box-shadow: 0 18px 45px rgba(8,145,178,0.16), 0 0 38px rgba(15,118,110,0.10);
+        display: flex;
+        align-items: flex-end;
+    }}
+
+    .export-hero-card::before {{
         content: "";
         position: absolute;
-        top: -70%;
-        left: -60%;
-        width: 42%;
-        height: 240%;
-        background: linear-gradient(120deg, rgba(255,255,255,0.00) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0.70) 50%, rgba(255,255,255,0.18) 62%, rgba(255,255,255,0.00) 100%);
-        transform: rotate(22deg);
-        animation: downloadShine 4.6s infinite ease-in-out;
+        inset: 0;
+        background: radial-gradient(circle at 18% 18%, rgba(34,211,238,0.22), transparent 34%),
+                    linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.48));
         pointer-events: none;
-    }
-    @keyframes downloadShine {
-        0% { left: -65%; opacity: 0; }
-        30% { opacity: 1; }
-        55% { left: 130%; opacity: 0; }
-        100% { left: 130%; opacity: 0; }
-    }
+    }}
+
+    .export-hero-card::after {{
+        content: "";
+        position: absolute;
+        top: -60%;
+        left: -40%;
+        width: 26%;
+        height: 220%;
+        background: linear-gradient(120deg, rgba(255,255,255,0.00) 0%, rgba(255,255,255,0.11) 38%, rgba(255,255,255,0.34) 50%, rgba(255,255,255,0.10) 62%, rgba(255,255,255,0.00) 100%);
+        transform: rotate(22deg);
+        animation: exportHeroShine 7.5s infinite ease-in-out;
+        pointer-events: none;
+    }}
+
+    .export-hero-content {{
+        position: relative;
+        z-index: 2;
+        max-width: 760px;
+        color: #FFFFFF;
+        text-shadow: 0 3px 14px rgba(0,0,0,0.34);
+    }}
+
+    .export-hero-title {{
+        font-size: 38px;
+        font-weight: 950;
+        line-height: 1.12;
+        margin: 0 0 12px 0;
+    }}
+
+    .export-hero-text {{
+        font-size: 17px;
+        font-weight: 800;
+        line-height: 1.75;
+        margin: 0;
+        color: #E8FCFF;
+    }}
+
+    .export-hero-pill-row {{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+    }}
+
+    .export-hero-pill {{
+        background: rgba(3,7,18,0.42);
+        border: 1px solid rgba(255,255,255,0.24);
+        border-radius: 999px;
+        padding: 8px 13px;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 850;
+        backdrop-filter: blur(8px);
+    }}
+
+    @keyframes exportHeroShine {{
+        0% {{ left: -45%; opacity: 0; }}
+        24% {{ opacity: 0.70; }}
+        44% {{ left: 128%; opacity: 0; }}
+        100% {{ left: 128%; opacity: 0; }}
+    }}
+
+    div[data-testid="stDownloadButton"] > button,
+    div.stButton > button {{
+        position: relative !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        border-radius: 18px !important;
+        min-height: 66px !important;
+        font-size: 18px !important;
+        font-weight: 950 !important;
+        transition: all 0.24s ease !important;
+        margin-bottom: 14px !important;
+    }}
+
+    div[data-testid="stDownloadButton"] > button {{
+        background: linear-gradient(135deg, #0891B2 0%, #0F766E 58%, #4F46E5 100%) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255,255,255,0.18) !important;
+        box-shadow: 0 12px 28px rgba(15,118,110,0.26), 0 0 18px rgba(34,211,238,0.10) !important;
+    }}
+
+    div.stButton > button {{
+        background: linear-gradient(135deg, #111827 0%, #1F2937 48%, #0F766E 100%) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(34,211,238,0.28) !important;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.22) !important;
+    }}
+
+    div[data-testid="stDownloadButton"] > button:hover,
+    div.stButton > button:hover {{
+        transform: translateY(-2px) scale(1.006) !important;
+        filter: brightness(1.08) !important;
+        box-shadow: 0 16px 34px rgba(15,118,110,0.36), 0 0 22px rgba(34,211,238,0.16) !important;
+    }}
+
+    div[data-testid="stDownloadButton"] > button::after,
+    div.stButton > button::after {{
+        content: "";
+        position: absolute;
+        top: -80%;
+        left: -78%;
+        width: 22%;
+        height: 260%;
+        background: linear-gradient(120deg, rgba(255,255,255,0.00) 0%, rgba(255,255,255,0.07) 40%, rgba(255,255,255,0.24) 50%, rgba(255,255,255,0.07) 60%, rgba(255,255,255,0.00) 100%);
+        transform: rotate(23deg);
+        animation: exportButtonShine 9s infinite ease-in-out;
+        pointer-events: none;
+    }}
+
+    @keyframes exportButtonShine {{
+        0% {{ left: -82%; opacity: 0; }}
+        28% {{ opacity: 0.65; }}
+        46% {{ left: 130%; opacity: 0; }}
+        100% {{ left: 130%; opacity: 0; }}
+    }}
     </style>
+
+    <div class="export-hero-card">
+        <div class="export-hero-content">
+            <div class="export-hero-title">📥 Export Downloads</div>
+            <p class="export-hero-text">
+                Download the full filtered dataset or a quick PDF summary. Excel is large, so click Prepare once; then Download appears. PDF downloads directly.
+            </p>
+            <div class="export-hero-pill-row">
+                <div class="export-hero-pill">📊 Excel file: {rows_to_export:,} full filtered rows</div>
+                <div class="export-hero-pill">📄 PDF: summary report</div>
+            </div>
+        </div>
+    </div>
     """, unsafe_allow_html=True)
 
     def create_simple_pdf_report():
@@ -2767,6 +3851,7 @@ if uploaded_file:
             f"Top theme: {top_theme_name}",
             f"Top subtheme: {top_subtheme_name}",
             f"Main negative theme: {top_negative_theme_name}",
+            f"Most repeated problem: {top_problem_text}",
             "",
             "Recommended actions:",
         ]
@@ -2809,12 +3894,69 @@ if uploaded_file:
         pdf.extend(f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_start}\n%%EOF".encode())
         return bytes(pdf)
 
-    pdf_file = create_simple_pdf_report()
+    @st.cache_data(show_spinner=False)
+    def convert_df_to_excel_download(dataframe):
+        output = BytesIO()
+        try:
+            with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+                dataframe.to_excel(writer, index=False, sheet_name="Filtered_Reviews")
+        except Exception:
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine="openpyxl") as writer:
+                dataframe.to_excel(writer, index=False, sheet_name="Filtered_Reviews")
+        return output.getvalue()
 
+    export_signature = (
+        rows_to_export,
+        tuple(full_filtered_df.columns.tolist()),
+        tuple(selected_years),
+        tuple(selected_quarters),
+        tuple(selected_months),
+        tuple(selected_ratings),
+        tuple(selected_languages),
+        tuple(selected_sentiments),
+        tuple(selected_themes),
+        tuple(selected_subthemes),
+    )
+
+    if st.session_state.get("export_signature") != export_signature:
+        st.session_state["export_signature"] = export_signature
+        st.session_state["excel_export_bytes"] = None
+
+    if st.session_state.get("excel_export_bytes") is None:
+        if st.button(
+            f"💎⚙️ Prepare Full Excel — {rows_to_export:,} rows",
+            use_container_width=True,
+            key="prepare_full_excel_clean_final"
+        ):
+            export_progress = st.progress(0, text=f"Preparing Excel: 0% — {rows_to_export:,} rows")
+            export_progress.progress(15, text="Preparing Excel: 15% — checking rows")
+            time.sleep(0.05)
+            export_progress.progress(45, text="Preparing Excel: 45% — writing filtered data")
+            st.session_state["excel_export_bytes"] = convert_df_to_excel_download(full_filtered_df)
+            export_progress.progress(85, text="Preparing Excel: 85% — finalizing file")
+            time.sleep(0.05)
+            export_progress.progress(100, text=f"Excel ready: 100% — {rows_to_export:,} rows")
+            time.sleep(0.15)
+            export_progress.empty()
+            st.success(f"✅ Excel is ready: {rows_to_export:,} rows included. Click the download button below.")
+            st.rerun()
+    else:
+        st.download_button(
+            label=f"💎⬇️ Download Full Excel — {rows_to_export:,} rows",
+            data=st.session_state["excel_export_bytes"],
+            file_name="sehhaty_filtered_reviews_full.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True,
+            key="download_full_excel_clean_final"
+        )
+
+    pdf_bytes = create_simple_pdf_report()
     st.download_button(
-        label="📄 Download PDF Report",
-        data=pdf_file,
+        label="💎📄 Download PDF Summary Report",
+        data=pdf_bytes,
         file_name="sehhaty_dashboard_report.pdf",
         mime="application/pdf",
-        use_container_width=True
+        use_container_width=True,
+        key="download_pdf_report_clean_final"
     )
